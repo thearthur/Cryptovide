@@ -1,0 +1,15 @@
+ <arg value = "clojure.contrib.duck-streams" /> 
+<arg value = "com.cryptovide.combine" /> 
+<arg value = "com.cryptovide.combineTest" /> 
+<arg value = "com.cryptovide.cryptovideTest" /> 
+<arg value = "com.cryptovide.encrypt" /> 
+<arg value = "com.cryptovide.encryptTest" /> 
+<arg value = "com.cryptovide.main" /> 
+<arg value = "com.cryptovide.misc" /> 
+<arg value = "com.cryptovide.miscTest" /> 
+<arg value = "com.cryptovide.modmath" /> 
+<arg value = "com.cryptovide.modmathTest" /> 
+<arg value = "com.cryptovide.split" /> 
+<arg value = "com.cryptovide.splitTest" /> 
+<arg value = "com.cryptovide.testlib" /> 
+<arg value = "org.gnufoo.unit-test.unit-test"/>
