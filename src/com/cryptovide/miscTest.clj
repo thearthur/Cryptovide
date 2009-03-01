@@ -10,8 +10,14 @@
   (let [results (map #(= (count (seque 20000 (range %))) %) (range 1000))]
     (assert-true (every? true? results) "Clojure core function seque is still broken :(")))
 
-(deftest test-non-blocking-seque []
-  (let [results (map #(= (count (non-blocking-seque 20000 (range %))) %)
-                  (range 1000))]
-    (assert-true (every? true? results) "Clojure core function seque is still broken :(")))
+(deftest test-write-seq-to-file []
+    (with-open [test-file (writer input-file-name)]
+      (write-seq-to-file test-file \a (seq "test")))
+    (assert-file-contains input-file-name (intify (str \a "test"))))
 
+(deftest test-byte-seq []
+  (create-test-file)
+  (with-open [test-file (reader input-file-name)]
+    (let [result (byte-seq test-file)]
+      (assert-equal test-data (seq (stringify result))))
+    (assert-expect Exception (. test-file read))))
