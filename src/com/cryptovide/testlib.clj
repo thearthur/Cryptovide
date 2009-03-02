@@ -3,6 +3,7 @@
 (use 'com.cryptovide.misc)
 (use 'org.gnufoo.unit-test.unit-test)
 
+(def input-file-name "/tmp/testfile")
 (def test-size 1000)
 (defn rand-seq
   "produce a lazy sequence of random ints < limit"
@@ -42,8 +43,20 @@
 
 (defmacro with-fake-prng [ & exprs ]
   "replaces the prng with one that produces consisten results"
-  `(binding [com.cryptovide.split/coificients (cycle [1 2 3])]
+  `(binding [com.cryptovide.split/coificients (cycle [1 2 3])
+             com.cryptovide.modmath/mody 719]
      ~@exprs))
+
+(use '[clojure.contrib.duck-streams :only (writer)])
+(def test-data (seq (map int "the quick brown fox jumped over the lazy dog")))
+
+(defn create-test-file 
+  ([] (create-test-file ""))
+  ([suffix]
+    (let [name (str input-file-name suffix)]
+      (with-open [test-file (writer name)]
+        (write-seq-to-file test-file test-data))
+      name)))
 
 (defn assert-file-contains [file expected]
 "checks a files contens against a string"

@@ -16,6 +16,13 @@
 (defn intify [stringy]
  (map int (seq stringy)))
 
+(defn byte-seq [rdr]
+  (let [result (. rdr read)]
+    (if (= result -1)
+      (. rdr close)
+      (lazy-cons result (byte-seq rdr)))))
+
+(use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn write-seq-to-file [file & data]
   "writes sequences of things that can be cast to ints, to the open file"
   (when-not (empty? data)
@@ -25,9 +32,3 @@
                (list (int (first data)))
                )))
     (recur file (rest data))))
-
-(defn byte-seq [rdr]
-  (let [result (. rdr read)]
-    (if (= result -1)
-      (. rdr close)
-      (lazy-cons result (byte-seq rdr)))))

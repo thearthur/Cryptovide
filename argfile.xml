@@ -2,6 +2,8 @@
 <arg value = "com.cryptovide.combine" /> 
 <arg value = "com.cryptovide.combineTest" /> 
 <arg value = "com.cryptovide.cryptovideTest" /> 
+<arg value = "com.cryptovide.decrypt" /> 
+<arg value = "com.cryptovide.decryptTest" /> 
 <arg value = "com.cryptovide.encrypt" /> 
 <arg value = "com.cryptovide.encryptTest" /> 
 <arg value = "com.cryptovide.main" /> 

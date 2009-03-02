@@ -1,24 +1,11 @@
 (ns com.cryptovide.encrypt)
 (use 'com.cryptovide.split)
-(defn byte-seq [rdr]
-  (let [result (. rdr read)]
-    (if (= result -1)
-      (. rdr close)
-      (lazy-cons result (byte-seq rdr)))))
+(use 'com.cryptovide.misc)
 
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 ;(use '[org.clojure.clojure-contrib.duck-streams :only (reader writer)])
 (defn split-file [filename parts threshold]
   (split (map int (byte-seq (reader filename))) 3 4))
-
-(defn write-seq-to-file [file & data]
-  (when-not (empty? data)
-    (doall (map #(. file (write %))
-             (if (seq? (first data))
-               (map int (first data))
-               (list (int (first data)))
-               )))
-    (recur file (rest data))))
 
 (defn write-file [index cyphertext file-name]
   (with-open [file (writer file-name)]

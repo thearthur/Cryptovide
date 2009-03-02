@@ -4,12 +4,7 @@
 (use 'com.cryptovide.testlib)
 (use 'org.gnufoo.unit-test.unit-test)
 (use '[clojure.contrib.duck-streams :only (reader writer)])
-(def test-data (seq "the quick brown fox jumped over the lazy dog"))
-(def input-file-name "/tmp/testfile")
 
-(defn create-test-file []
-  (with-open [test-file (writer input-file-name)]
-    (write-seq-to-file test-file test-data)))
 
 (deftest test-encrypt-file []
   (create-test-file)
