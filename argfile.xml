@@ -18,5 +18,4 @@
 <arg value = "com.cryptovide.modmathTest" /> 
 <arg value = "com.cryptovide.split" /> 
 <arg value = "com.cryptovide.splitTest" /> 
-<arg value = "com.cryptovide.testlib" /> 
-<arg value = "org.gnufoo.unit-test.unit-test"/>
+<arg value = "com.cryptovide.testlib"/>
