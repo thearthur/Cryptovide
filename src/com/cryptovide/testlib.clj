@@ -1,7 +1,8 @@
 (ns com.cryptovide.testlib)
 (use 'com.cryptovide.modmath)
 (use 'com.cryptovide.misc)
-(use 'org.gnufoo.unit-test.unit-test)
+;(use 'org.gnufoo.unit-test.unit-test)
+(use 'clojure.contrib.test-is)
 
 (def input-file-name "/tmp/testfile")
 (def test-size 1000)
@@ -29,7 +30,7 @@
   ([fun] `(range-test ~fun (test-numbers) (test-numbers)))
   ([fun & seqs]
      `(let [results# (map ~fun ~@seqs)]
-	(assert-true (in-range? results#)
+	(is (in-range? results#)
 		      (str (quote ~fun) ": result out of range " results#)))))
 
 (defmacro simple-test
@@ -39,7 +40,7 @@
     `(deftest ~(symbol (str 'fun# (gensym '-test))) []
      (let [output# ~expression
 	   expected# ~output]
-       (assert-equal expected# output# ~(str " from " expression))))))
+       (is (= expected# output#) ~(str " from " expression))))))
 
 (defmacro with-fake-prng [ & exprs ]
   "replaces the prng with one that produces consisten results"
@@ -65,4 +66,4 @@
 
 (defn assert-file-contains [file expected]
 "checks a files contens against a string"
-  (assert-equal expected (intify (slurp file))))
+  (is (= expected (intify (slurp file)))))

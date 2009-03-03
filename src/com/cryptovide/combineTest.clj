@@ -2,7 +2,7 @@
 (use 'com.cryptovide.combine)
 (use 'com.cryptovide.split)
 (use 'com.cryptovide.testlib)
-(use 'org.gnufoo.unit-test.unit-test)
+(use 'clojure.contrib.test-is)
 (use 'com.cryptovide.modmath)
 (println "testing combine.clj")
 (simple-test (row 3 0 1) [0 0 1 1])
@@ -30,9 +30,9 @@
 
 (simple-test (solve '([1 1 1 2] [4 2 1 3] [9 3 1 4])) 1)
 
-(deftest split-and-combine []
+(deftest split-and-combine
   "split a bunch of numbers and recombine them."
   (let [numbers (test-numbers)
 	splits (split numbers 5 10)
 	unsplits (combine splits)]
-    (assert-equal numbers unsplits "faied to combine")))
+    (is (= numbers unsplits) "faied to combine")))

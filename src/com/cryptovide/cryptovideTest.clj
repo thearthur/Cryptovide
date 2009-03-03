@@ -1,5 +1,5 @@
 (ns com.cryptovide.cryptovideTest)
-(use 'org.gnufoo.unit-test.unit-test)
+;(use 'org.gnufoo.unit-test.unit-test)
 (use 'com.cryptovide.modmathTest)
 (use 'com.cryptovide.combineTest)
 (use 'com.cryptovide.splitTest)
@@ -10,7 +10,7 @@
 
 (defn cryptovideTest []
   (println "creating tests")
-  (my-run-all-tests
+  (run-tests
     'com.cryptovide.modmathTest
     'com.cryptovide.combineTest
     'com.cryptovide.splitTest

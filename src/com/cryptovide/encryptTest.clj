@@ -2,11 +2,11 @@
 (use 'com.cryptovide.encrypt)
 (use 'com.cryptovide.misc)
 (use 'com.cryptovide.testlib)
-(use 'org.gnufoo.unit-test.unit-test)
+(use 'clojure.contrib.test-is)
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 
 
-(deftest test-encrypt-file []
+(deftest test-encrypt-file
   (create-test-file)
   (let [file1 (str input-file-name "1")
         file2 (str input-file-name "2")

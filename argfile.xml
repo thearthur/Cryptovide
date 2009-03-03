@@ -1,4 +1,9 @@
  <arg value = "clojure.contrib.duck-streams" /> 
+<arg value = "clojure.contrib.stacktrace" /> 
+<arg value = "clojure.contrib.template" /> 
+<arg value = "clojure.contrib.test-is" /> 
+<arg value = "clojure.contrib.test-is.tests" /> 
+<arg value = "clojure.contrib.walk" /> 
 <arg value = "com.cryptovide.combine" /> 
 <arg value = "com.cryptovide.combineTest" /> 
 <arg value = "com.cryptovide.cryptovideTest" /> 
