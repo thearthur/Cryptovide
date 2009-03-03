@@ -1,7 +1,6 @@
 (ns com.cryptovide.testlib)
 (use 'com.cryptovide.modmath)
 (use 'com.cryptovide.misc)
-;(use 'org.gnufoo.unit-test.unit-test)
 (use 'clojure.contrib.test-is)
 
 (def input-file-name "/tmp/testfile")
