@@ -8,7 +8,7 @@
 
 (defn write-file [index cyphertext file-name]
   (with-open [file (writer file-name)]
-    (write-seq-to-file1 file index cyphertext)))
+    (write-seq-to-file file index cyphertext)))
 
 (defn encrypt-file [input-file output-file-names threshold]
   (let [parts (count output-file-names)
