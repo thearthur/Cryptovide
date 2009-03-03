@@ -6,6 +6,7 @@
 (use 'com.cryptovide.encryptTest)
 (use 'com.cryptovide.miscTest)
 (use 'com.cryptovide.decryptTest)
+(use 'clojure.contrib.test-is)
 
 (defn cryptovideTest []
   (println "creating tests")
