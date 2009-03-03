@@ -3,9 +3,8 @@
 (use 'com.cryptovide.misc)
 
 (use '[clojure.contrib.duck-streams :only (reader writer)])
-;(use '[org.clojure.clojure-contrib.duck-streams :only (reader writer)])
 (defn split-file [filename parts threshold]
-  (split (map int (byte-seq (reader filename))) 3 4))
+  (split (map int (byte-seq (reader filename))) parts threshold))
 
 (defn write-file [index cyphertext file-name]
   (with-open [file (writer file-name)]

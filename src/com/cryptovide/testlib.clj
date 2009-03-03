@@ -50,10 +50,15 @@
 (use '[clojure.contrib.duck-streams :only (writer)])
 (def test-data (seq (map int "the quick brown fox jumped over the lazy dog")))
 
-(defn create-test-file 
+(defn create-test-filename [suffix]
+  "generate a temporary filename"
+  (str input-file-name suffix))
+
+(defn create-test-file
+  "write some test data to a file with the given suffix"
   ([] (create-test-file ""))
   ([suffix]
-    (let [name (str input-file-name suffix)]
+    (let [name (create-test-filename suffix)]
       (with-open [test-file (writer name)]
         (write-seq-to-file test-file test-data))
       name)))
