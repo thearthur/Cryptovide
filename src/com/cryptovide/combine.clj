@@ -19,17 +19,17 @@
 (defn matrices
   "produce lazy sequence of a matrcies"
   [secrets]
-  (let [terms (map first secrets)
-	answers (map second secrets)
-	parts (count secrets) 
-	matrix-seq
-	(fn this [answers]
-	  (when-not (some empty? answers)
-	    (let [firsts-answers (map first answers)
-		  rests-answers (map rest answers)]
-	      (lazy-cons
-	       (matrix parts terms firsts-answers)
-	       (this rests-answers)))))]
+  (let [terms (map :index secrets)
+        answers (map :data secrets)
+        parts (count secrets)
+        matrix-seq
+        (fn this [answers]
+          (when-not (some empty? answers)
+            (let [firsts-answers (map first answers)
+                  rests-answers (map rest answers)]
+              (lazy-cons
+                (matrix parts terms firsts-answers)
+                (this rests-answers)))))]
   (matrix-seq answers)))
 
 (defn corner [matrix]

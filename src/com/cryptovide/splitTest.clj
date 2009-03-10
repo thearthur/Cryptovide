@@ -13,6 +13,8 @@
 (deftest split-test
   "rebind coificients to 1 and test split"
   (let [result (with-fake-prng (split [0 1 2] 2 3))
-        answer '([1 (1 3 5)] [2 (2 5 8)] [3 (3 7 11)])]
+        answer '({:index 1 :data (1 3 5)}
+                  {:index 2 :data (2 5 8)}
+                  {:index 3 :data (3 7 11)})]
     (is (= answer result) "simple split test")))
 

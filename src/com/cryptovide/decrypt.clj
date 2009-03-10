@@ -18,7 +18,7 @@
 (defn decrypt-files [file-names]
   (let [files (open-input-files file-names)
         cyphertexts (map read-input-file files)]
-    (combine (map (fn [m] [(:index m) (:data m)]) cyphertexts))))
+    (combine cyphertexts)))
 
 (defn decrypt-and-save [input-names output-name]
   (with-open [output-file (writer output-name)]

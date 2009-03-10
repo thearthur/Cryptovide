@@ -17,6 +17,6 @@
 	      (lazy-cons 
 	       (eval-poly (cons (first secrets) current-coificients) x)
 	       (this (rest secrets) threshold rest-coificients x)))))]
-    (map (fn [x] [x (splitter secrets threshold coificients x)])
+    (map (fn [x] {:index x :data (splitter secrets threshold coificients x)})
 	 (range 1 (inc parts)))))
 
