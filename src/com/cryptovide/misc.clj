@@ -2,6 +2,8 @@
 (def debug false)
 (def buffer-size 2)
 
+(defstruct secret  :index :block-size :data)
+
 (defn my-partition 
   "like partition except it wont drop the remainder at the end of the seq"
   [n coll]
@@ -16,11 +18,11 @@
 (defn intify [stringy]
  (map int (seq stringy)))
 
-(defn byte-seq [rdr]
+(defn block-seq [rdr]
   (let [result (. rdr read)]
     (if (= result -1)
       (. rdr close)
-      (lazy-cons result (byte-seq rdr)))))
+      (lazy-cons result (block-seq rdr)))))
 
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn write-seq-to-file [file & data]

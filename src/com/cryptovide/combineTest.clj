@@ -30,6 +30,9 @@
 
 (simple-test (solve '([1 1 1 2] [4 2 1 3] [9 3 1 4])) 1)
 
+(simple-test (combine (split [0] 1 1)) [0])
+(simple-test (combine (split [0] 2 2)) [0])
+(simple-test (combine (split [0] 2 20)) [0])
 (deftest split-and-combine
   "split a bunch of numbers and recombine them."
   (let [numbers (test-numbers)

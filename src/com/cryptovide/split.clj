@@ -2,7 +2,7 @@
 (use 'com.cryptovide.modmath)
 (use 'com.cryptovide.misc)
 (def coificients (cycle [1 2 3 4 5 6 7 8 ]))
-;;(def coificients (cycle [1]))
+(defn get-prng [] coificients)
 
 
 (defn split [secrets threshold parts]
@@ -17,6 +17,6 @@
 	      (lazy-cons 
 	       (eval-poly (cons (first secrets) current-coificients) x)
 	       (this (rest secrets) threshold rest-coificients x)))))]
-    (map (fn [x] {:index x :data (splitter secrets threshold coificients x)})
-	 (range 1 (inc parts)))))
+    (map (fn [x] (struct secret x 1 (splitter secrets threshold coificients x)))
+	 (take parts (range 1 (inc parts))))))
 
