@@ -7,7 +7,7 @@
   (if (or (>= x mody) (neg? x))
     (throw (new java.lang.Exception (str "number out of range " x)))))
 
-(defn mod [x y] (let [r (rem x y)] (if (neg? r) (+ r y) r)))
+;;(defn mod [x y] (let [r (rem x y)] (if (neg? r) (+ r y) r)))
 
 (defn mod* [x y] (mod (* x y) mody))
 (defn mod+ [x y] (mod (+ x y) mody))

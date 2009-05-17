@@ -8,9 +8,9 @@ Sample clojure source file
 (use 'com.cryptovide.cryptovideTest)
 (defn -main
   []
-  (let [result (split [1 2 3 4] 2 3)]
+  (let [result (seq (split [1 2 3 4] 2 3))]
     (println (str "result is " result ))
-    (println (str "combined result is " (combine result))))
+    (println (str "combined result is " (seq (combine result)))))
   (cryptovideTest)
   (System/exit 0))
 

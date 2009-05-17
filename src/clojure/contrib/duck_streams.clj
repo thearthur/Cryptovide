@@ -1,9 +1,9 @@
 ;;; duck_streams.clj -- duck-typed I/O streams for Clojure
 
 ;; by Stuart Sierra, http://stuartsierra.com/
-;; January 10, 2009
+;; May 3, 2009
 
-;; Copyright (c) Stuart Sierra, 2008. All rights reserved.  The use
+;; Copyright (c) Stuart Sierra, 2009. All rights reserved.  The use
 ;; and distribution terms for this software are covered by the Eclipse
 ;; Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
 ;; which can be found in the file epl-v10.html at the root of this
@@ -26,6 +26,13 @@
 
 ;; CHANGE LOG
 ;;
+;; May 3, 2009: renamed file to file-str, for compatibility with
+;; clojure.contrib.java-utils.  reader/writer no longer use this
+;; function.
+;;
+;; February 16, 2009: (lazy branch) fixed read-lines to work with lazy
+;; Clojure.
+;;
 ;; January 10, 2009: added *default-encoding*, so streams are always
 ;; opened as UTF-8.
 ;;
@@ -36,9 +43,21 @@
 
 
 
-(ns clojure.contrib.duck-streams
+(ns 
+  #^{:author "Stuart Sierra",
+     :doc "This file defines \"duck-typed\" I/O utility functions for Clojure.
+           The 'reader' and 'writer' functions will open and return an
+           instance of java.io.BufferedReader and java.io.PrintWriter,
+           respectively, for a variety of argument types -- filenames as
+           strings, URLs, java.io.File's, etc.  'reader' even works on http
+           URLs.
+
+           Note: this is not really \"duck typing\" as implemented in languages
+           like Ruby.  A better name would have been \"do-what-I-mean-streams\"
+           or \"just-give-me-a-stream\", but ducks are funnier."} 
+    clojure.contrib.duck-streams
     (:import 
-     (java.io Reader InputStream InputStreamReader 
+     (java.io Reader InputStream InputStreamReader PushbackReader
               BufferedReader File PrintWriter OutputStream
               OutputStreamWriter BufferedWriter Writer
               FileInputStream FileOutputStream)
@@ -47,17 +66,16 @@
 
 (def *default-encoding* "UTF-8")
 
-(defn #^File file
-  "Concatenates args as strings returns a java.io.File.  Replaces all
-  / and \\ with File/separatorChar.  Replaces ~ at the start of the
-  path with the user.home system property."
+(defn #^File file-str
+  "Concatenates args as strings and returns a java.io.File.  Replaces
+  all / and \\ with File/separatorChar.  Replaces ~ at the start of
+  the path with the user.home system property."
   [& args]
   (let [#^String s (apply str args)
-        s (.replace s \/ File/separatorChar)
-        s (.replace s \\ File/separatorChar)
+        s (.replaceAll (re-matcher #"[/\\]" s) File/separator)
         s (if (.startsWith s "~")
             (str (System/getProperty "user.home")
-                 File/separatorChar (subs s 1))
+                 File/separator (subs s 1))
             s)]
     (File. s)))
 
@@ -72,10 +90,12 @@
   local file names.  Uses *default-encoding* as the text encoding.
 
   Should be used inside with-open to ensure the Reader is properly
-  closed."}
+  closed."
+             :arglists '([x])}
   reader class)
 
-(defmethod reader Reader [x] x)
+(defmethod reader Reader [x]
+  (BufferedReader. x))
 
 (defmethod reader InputStream [x]
   (BufferedReader. (InputStreamReader. x *default-encoding*)))
@@ -95,7 +115,7 @@
   (try (let [url (URL. x)]
          (reader url))
        (catch MalformedURLException e
-         (reader (file x)))))
+         (reader (File. x)))))
 
 (defmethod reader :default [x]
   (throw (Exception. (str "Cannot open " (pr-str x) " as a reader."))))
@@ -113,7 +133,8 @@
   local file names.
 
   Should be used inside with-open to ensure the Writer is properly
-  closed."}
+  closed."
+             :arglists '([x])}
   writer class)
 
 (defmethod writer PrintWriter [x] x)
@@ -145,16 +166,15 @@
   (try (let [url (URL. x)]
          (writer url))
        (catch MalformedURLException err
-         (writer (file x)))))
+         (writer (File. x)))))
 
 (defmethod writer :default [x]
   (throw (Exception. (str "Cannot open <" (pr-str x) "> as a writer."))))
 
 
-
 (defn write-lines
   "Writes lines (a seq) to f, separated by newlines.  f is opened with
-  writer."
+  writer, and automatically closed at the end of the sequence."
   [f lines]
   (with-open [#^PrintWriter writer (writer f)]
     (loop [lines lines]
@@ -168,9 +188,10 @@
   closes the reader AFTER YOU CONSUME THE ENTIRE SEQUENCE."
   [f]
   (let [read-line (fn this [#^BufferedReader rdr]
-                    (if-let [line (.readLine rdr)]
-                        (lazy-cons line (this rdr))
-                      (.close rdr)))]
+                    (lazy-seq
+                     (if-let [line (.readLine rdr)]
+                       (cons line (this rdr))
+                       (.close rdr))))]
     (read-line (reader f))))
 
 (defn slurp*
@@ -196,3 +217,19 @@
   Note: In Java, you cannot change the current working directory."
   []
   (System/getProperty "user.dir"))
+
+
+
+(defmacro with-out-writer
+  "Opens a writer on f, binds it to *out*, and evalutes body."
+  [f & body]
+  `(with-open [stream# (writer ~f)]
+     (binding [*out* stream#]
+       ~@body)))
+
+(defmacro with-in-reader
+  "Opens a PushbackReader on f, binds it to *in*, and evaluates body."
+  [f & body]
+  `(with-open [stream# (PushbackReader. (reader ~f))]
+     (binding [*in* stream#]
+       ~@body)))

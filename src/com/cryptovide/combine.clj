@@ -26,14 +26,15 @@
         (fn this [answers]
           (when-not (some empty? answers)
             (let [firsts-answers (map first answers)
-                  rests-answers (map rest answers)]
-              (lazy-cons
-                (matrix parts terms firsts-answers)
-                (this rests-answers)))))]
+                  rests-answers (map next answers)]
+              (lazy-seq
+                (cons
+                  (matrix parts terms firsts-answers)
+                (this rests-answers))))))]
   (matrix-seq answers)))
 
 (defn corner [matrix]
-  (map (fn [m] (subvec m 1)) (rest matrix)))
+  (map (fn [m] (subvec m 1)) (next matrix)))
 
 (defn row-op [top bottom]
   (let [ftop (first top)
@@ -47,11 +48,11 @@
 
 (defn do-row-ops [matrix]
   (let [top (first matrix)]
-    (conj (map (fn [bottom] (row-op top bottom)) (rest matrix)) top)))
+    (conj (map (fn [bottom] (row-op top bottom)) (next matrix)) top)))
   
 (defn solve [matrix]
   (if debug (println matrix))
-  (if (rest matrix)
+  (if (next matrix)
     (recur (corner (do-row-ops matrix)))
     (mod* (second (first matrix)) (modinv (first (first matrix))))))
 

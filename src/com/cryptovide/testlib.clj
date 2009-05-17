@@ -11,10 +11,11 @@
   ([limit] 
      (rand-seq limit (new java.util.Random)))
   ([limit prng]
-     (lazy-cons (if limit
-		  (. prng nextInt limit)
-		  (. prng nextInt))
-		(rand-seq limit prng))))
+     (lazy-seq
+       (cons (if limit
+               (. prng nextInt limit)
+               (. prng nextInt))
+         (rand-seq limit prng)))))
 
 (defn test-numbers []
   (take test-size (rand-seq mody)))

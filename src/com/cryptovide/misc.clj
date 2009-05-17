@@ -9,7 +9,7 @@
   [n coll]
   (when (seq coll)
     (let [[chunk rest-coll] (split-at n coll)]
-      (lazy-cons chunk (my-partition n rest-coll)))))
+      (lazy-seq (cons chunk (my-partition n rest-coll))))))
 
 (defn stringify [ints]
   "maps a seq of ints into a string"
@@ -22,7 +22,7 @@
   (let [result (. rdr read)]
     (if (= result -1)
       (. rdr close)
-      (lazy-cons result (block-seq rdr)))))
+      (lazy-seq (cons result (block-seq rdr))))))
 
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn write-seq-to-file [file & data]

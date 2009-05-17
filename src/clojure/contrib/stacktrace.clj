@@ -12,7 +12,10 @@
 ;; remove this notice, or any other, from this software.
 
 
-(ns clojure.contrib.stacktrace)
+(ns 
+  #^{:author "Stuart Sierra",
+     :doc "Print Clojure-centric stack traces"}
+  clojure.contrib.stacktrace)
 
 (defn root-cause
   "Returns the last 'cause' Throwable in a chain of Throwables."
@@ -63,7 +66,7 @@
      (print-stack-trace tr n)
      (when-let [cause (.getCause tr)]
        (print "Caused by: " )
-       (print-stack-trace cause n))))
+       (recur cause n))))
 
 (defn e
   "REPL utility.  Prints a brief stack trace for the root cause of the
