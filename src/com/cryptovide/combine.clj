@@ -1,6 +1,11 @@
-(ns com.cryptovide.combine)
-(use 'com.cryptovide.modmath)
-(use 'com.cryptovide.misc)
+(ns 
+ #^{:author "Arthur Ulfeldt", 
+    :doc "combines secrets into sequences of plaintext"}
+ com.cryptovide.combine
+ (:gen-class)
+ (:use
+   com.cryptovide.modmath
+   com.cryptovide.misc))
 
 (defn row
   "produce a single row for a matrix"

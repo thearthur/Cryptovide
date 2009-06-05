@@ -1,4 +1,9 @@
-(ns com.cryptovide.misc)
+(ns 
+ #^{:author "Arthur Ulfeldt", 
+       :doc "miscelanios libs"}
+ com.cryptovide.misc
+ (:gen-class))
+
 (def debug false)
 (def buffer-size 2)
 

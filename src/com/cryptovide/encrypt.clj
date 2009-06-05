@@ -1,6 +1,11 @@
-(ns com.cryptovide.encrypt)
-(use 'com.cryptovide.split)
-(use 'com.cryptovide.misc)
+(ns 
+  #^{:author "Arthur Ulfeldt", 
+     :doc "splits input files into secrets and writes output files"}
+ com.cryptovide.encrypt
+ (:gen-class)
+ (:use
+   com.cryptovide.split
+   com.cryptovide.misc))
 
 (defn create-header [cyphertext]
   (list (:index cyphertext) (:block-size cyphertext)))

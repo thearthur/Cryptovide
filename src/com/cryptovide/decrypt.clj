@@ -1,7 +1,12 @@
-(ns com.cryptovide.decrypt)
-(use 'com.cryptovide.misc)
-(use 'com.cryptovide.combine)
-(use '[clojure.contrib.duck-streams :only (reader writer)])
+(ns 
+ #^{:author "Arthur Ulfeldt", 
+    :doc "reads encrypted files and writes decrypted files"}
+ com.cryptovide.decrypt
+ (:gen-class)
+ (:use
+   com.cryptovide.misc
+   com.cryptovide.combine
+   [clojure.contrib.duck-streams :only (reader writer)]))
 
 (defn open-input-file [file-name]
   (try (reader file-name)

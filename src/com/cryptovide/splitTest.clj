@@ -1,8 +1,12 @@
-(ns com.cryptovide.splitTest)
-(use 'com.cryptovide.split)
-(use 'com.cryptovide.testlib)
-(use 'clojure.contrib.test-is)
-(use 'com.cryptovide.modmath)
+(ns 
+ #^{:author "Arthur Ulfeldt", 
+    :doc "test lib for com.cryptovide.modmath"}
+ com.cryptovide.splitTest
+ (:use
+   com.cryptovide.split
+   com.cryptovide.testlib
+   clojure.contrib.test-is
+   com.cryptovide.modmath))
 
 (deftest coificients-test
   "verrify that the coificients are in range"
@@ -18,3 +22,7 @@
                   {:index 3 :block-size 1 :data (3 7 11)})]
     (is (= answer result) "simple split test")))
 
+(deftest stack-buster-test
+  "split a HUGE sequence and see if the stack blows its top"
+  (split (range 1000000000) 2 3)
+  (is true))

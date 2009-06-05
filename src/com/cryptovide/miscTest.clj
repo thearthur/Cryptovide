@@ -1,9 +1,14 @@
-(ns com.cryptovide.miscTest)
-(use 'com.cryptovide.misc)
-(use 'com.cryptovide.testlib)
-(use 'clojure.contrib.test-is)
-(use 'com.cryptovide.modmath)
-(use '[clojure.contrib.duck-streams :only (reader writer)])
+(ns 
+   #^{:author "Arthur Ulfeldt", 
+     :doc "test library for com.cryptovide.misc"}
+ com.cryptovide.miscTest
+ (:gen-class)
+ (:use
+   com.cryptovide.misc
+   com.cryptovide.testlib
+   clojure.contrib.test-is
+   com.cryptovide.modmath
+   [clojure.contrib.duck-streams :only (reader writer)]))
 
 (simple-test (count (seque 20000 (range 10))) 10)
 

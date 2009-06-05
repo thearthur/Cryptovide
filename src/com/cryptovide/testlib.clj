@@ -1,7 +1,12 @@
-(ns com.cryptovide.testlib)
-(use 'com.cryptovide.modmath)
-(use 'com.cryptovide.misc)
-(use 'clojure.contrib.test-is)
+(ns 
+ #^{:author "Arthur Ulfeldt", 
+    :doc "common functions for use by tests"}
+ com.cryptovide.testlib
+ (:gen-class)
+ (:use
+   com.cryptovide.modmath
+   com.cryptovide.misc
+   clojure.contrib.test-is))
 
 (def input-file-name "/tmp/testfile")
 (def test-size 1000)

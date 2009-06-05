@@ -1,7 +1,13 @@
-(ns com.cryptovide.modmathTest)
-(use 'com.cryptovide.testlib)
-(use 'com.cryptovide.modmath)
-(use 'clojure.contrib.test-is)
+(ns 
+  #^{:author "Arthur Ulfeldt", 
+     :doc "test lib for com.cryptovide.modmath"}
+ com.cryptovide.modmathTest
+ (:gen-class)
+ (:use
+   com.cryptovide.testlib
+   com.cryptovide.modmath
+   clojure.contrib.test-is))
+
 (deftest mod*-test 
   (range-test mod*))
 

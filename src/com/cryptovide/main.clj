@@ -1,11 +1,18 @@
 (comment
 Sample clojure source file
 )
-(ns com.cryptovide.main
-    (:gen-class))
-(use 'com.cryptovide.split)
-(use 'com.cryptovide.combine)
-(use 'com.cryptovide.cryptovideTest)
+(ns 
+  #^{:author "Arthur Ulfeldt", 
+     :doc "Polymorphic threshold encryption"}
+  com.cryptovide.main
+  (:gen-class)
+  (:use
+    com.cryptovide.split
+    com.cryptovide.combine
+    com.cryptovide.cryptovideTest))
+
+(declare main) ; this looks cool, wonder what it does?
+
 (defn -main
   []
   (let [result (seq (split [1 2 3 4] 2 3))]

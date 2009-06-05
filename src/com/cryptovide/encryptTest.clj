@@ -1,10 +1,14 @@
-(ns com.cryptovide.encryptTest)
-(use 'com.cryptovide.encrypt)
-(use 'com.cryptovide.misc)
-(use 'com.cryptovide.testlib)
-(use 'clojure.contrib.test-is)
-(use '[clojure.contrib.duck-streams :only (reader writer)])
-
+(ns
+ #^{:author "Arthur Ulfeldt",
+       :doc "tests for com.clojure.encrypt"}
+ com.cryptovide.encryptTest
+ (:gen-class)
+ (:use
+   com.cryptovide.encrypt
+   com.cryptovide.misc
+   com.cryptovide.testlib
+   clojure.contrib.test-is
+   [clojure.contrib.duck-streams :only (reader writer)]))
 
 (deftest test-encrypt-file
   (create-test-file)

@@ -1,4 +1,10 @@
-(ns com.cryptovide.modmath)
+(ns 
+   #^{:author "Arthur Ulfeldt", 
+     :doc "Defines the common modulous and common math opperators that use it"}
+ com.cryptovide.modmath
+ (:gen-class))
+
+
 ;;(def mody 151157)
 (def mody 719)
 ;;(def mody 11)
