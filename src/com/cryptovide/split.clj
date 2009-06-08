@@ -12,18 +12,9 @@
 
 (defn split [secrets threshold parts]
   "lazy seqs of the [x (secrets applied to a polynomial of threshold degree )]"
-  (let [splitter
-        (fn this [secrets threshold coificients x]
-          (when-not (or (empty? secrets)
-                      (empty? coificients)
-                      (neg? x))
-            (let [ [current-coificients rest-coificients]
-                  (split-at (dec threshold) coificients) ]
-              (lazy-seq
-                (cons
-                  (eval-poly (cons (first secrets) current-coificients) x)
-                  ;TODO: fix this stack consuming recursion
-                  (this (rest secrets) threshold rest-coificients x))))))]
-    (map (fn [x] (struct secret x 1 (splitter secrets threshold coificients x)))
+  (let [ spliter (fn [x coificients]
+                   (map #(eval-poly (cons %1 %2) x)
+                     secrets (partition (dec threshold) (get-prng))))]
+    (map (fn [x] (struct secret x 1 (spliter x coificients )))
       (take parts (range 1 (inc parts))))))
 
