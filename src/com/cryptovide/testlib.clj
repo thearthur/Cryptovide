@@ -10,17 +10,7 @@
 
 (def input-file-name "/tmp/testfile")
 (def test-size 1000)
-(defn rand-seq
-  "produce a lazy sequence of random ints < limit"
-  ([] (rand-seq nil (new java.util.Random)))
-  ([limit] 
-     (rand-seq limit (new java.util.Random)))
-  ([limit prng]
-     (lazy-seq
-       (cons (if limit
-               (. prng nextInt limit)
-               (. prng nextInt))
-         (rand-seq limit prng)))))
+
 
 (defn test-numbers []
   (take test-size (rand-seq mody)))
@@ -49,7 +39,7 @@
 
 (defmacro with-fake-prng [ & exprs ]
   "replaces the prng with one that produces consisten results"
-  `(binding [com.cryptovide.split/coificients (cycle [1 2 3])
+  `(binding [com.cryptovide.split/get-prng (fn [] (cycle [1 2 3]))
              com.cryptovide.modmath/mody 719]
      ~@exprs))
 
