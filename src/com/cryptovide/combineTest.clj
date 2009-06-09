@@ -18,7 +18,7 @@
 (simple-test (matrix 3 [1 2 3] [41 42 43])
 	     '([1 1 1 41] [4 2 1 42] [9 3 1 43]))
 
-(def test-results (split [1 2 3] 2 3))
+(def test-results (with-fake-prng (split [1 2 3] 2 3)))
 
 (simple-test (matrices test-results)
 	     '(([1 1 1 2] [4 2 1 3] [9 3 1 4])

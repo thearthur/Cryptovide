@@ -39,3 +39,15 @@
                (list (int (first data)))
                )))
     (recur file (rest data))))
+
+(defn rand-seq
+  "produce a lazy sequence of random ints < limit"
+  ([] (rand-seq nil (new java.util.Random)))
+  ([limit]
+     (rand-seq limit (new java.util.Random)))
+  ([limit prng]
+     (lazy-seq
+       (cons (if limit
+               (. prng nextInt limit)
+               (. prng nextInt))
+         (rand-seq limit prng)))))
