@@ -22,9 +22,9 @@
       (write-seq-to-file test-file \a (seq "test")))
     (assert-file-contains input-file-name (intify (str \a "test"))))
 
-(deftest test-block-seq
+(deftest test-byte-seq
   (create-test-file)
   (with-open [test-file (reader input-file-name)]
-    (let [result (block-seq test-file)]
+    (let [result (byte-seq test-file)]
       (is (= test-data result)))
     (is (thrown? Exception (. test-file read)))))

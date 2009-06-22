@@ -2,7 +2,8 @@
  #^{:author "Arthur Ulfeldt", 
        :doc "miscelanios libs"}
  com.cryptovide.misc
- (:gen-class))
+ (:gen-class)
+ (:use clojure.contrib.math))
 
 (def debug false)
 (def buffer-size 2)
@@ -23,11 +24,47 @@
 (defn intify [stringy]
  (map int (seq stringy)))
 
-(defn block-seq [rdr]
+(defn byte-seq [rdr]
   (let [result (. rdr read)]
     (if (= result -1)
-      (. rdr close)
-      (lazy-seq (cons result (block-seq rdr))))))
+      (do (. rdr close) nil)
+      (lazy-seq (cons result (byte-seq rdr))))))
+
+(defn ones
+  ([n] (ones n 1 1))
+  ([n i res]
+    (if (< i n)
+      (recur n (inc i) (bit-set res i))
+      res)))
+
+(defn extract-bits
+  [bytes len offset]
+  (bit-shift-right (bit-and bytes (bit-shift-left (ones len) offset)) offset))
+
+(defn block-seq
+  ([block-size bytes]
+    "reads a byte-seq into a sequence of block-size bits."
+    (block-seq 8 block-size bytes))
+  ([in-block-size out-block-size bytes]
+    "converts a seq from in-block-size to out-block-size"
+    (block-seq in-block-size out-block-size bytes 0 0 ))
+  ([in-block-size out-block-size bytes bits length]
+    (if (>= length out-block-size)
+      (lazy-seq
+        (cons
+          (extract-bits bits  out-block-size 0)
+          (block-seq in-block-size out-block-size bytes
+            (bit-shift-right bits out-block-size)
+            (- length out-block-size))))
+      (let [some-bits  (first bytes)
+            more-bytes (rest bytes)]
+        (assert (< length out-block-size))
+        (if (nil? some-bits)            ;when we cant get more bits
+          (if (= bits 0) nil            ;end the seq if no leftover bits
+            (lazy-seq (cons bits nil))) ;or pad the partial block at the end
+          (block-seq in-block-size out-block-size more-bytes
+            (bit-or bits (bit-shift-left some-bits length))
+            (+ length in-block-size)))))))
 
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn write-seq-to-file [file & data]

@@ -31,7 +31,7 @@
         (fn this [answers]
           (when-not (some empty? answers)
             (let [firsts-answers (map first answers)
-                  rests-answers (map next answers)]
+                  rests-answers (map rest answers)]
               (lazy-seq
                 (cons
                   (matrix parts terms firsts-answers)

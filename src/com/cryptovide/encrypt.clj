@@ -12,7 +12,7 @@
 
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn split-file [filename parts threshold]
-  (split (map int (block-seq (reader filename))) parts threshold))
+  (split (map int (block-seq 8 (byte-seq (reader filename)))) parts threshold))
 
 (defn write-file [cyphertext file-name]
   (with-open [file (writer file-name)]
