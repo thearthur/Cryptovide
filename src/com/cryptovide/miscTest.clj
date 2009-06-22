@@ -28,3 +28,10 @@
     (let [result (byte-seq test-file)]
       (is (= test-data result)))
     (is (thrown? Exception (. test-file read)))))
+
+(simple-test (block-seq 8 3 [1]) '(1 0))
+(simple-test (block-seq 8 8 [1 2 3 4]) '(1 2 3 4))
+(simple-test (block-seq 8 [1 2 3 4])  '(1 2 3 4))
+(simple-test (block-seq 8 8 []) nil)
+(simple-test (block-seq 1 [0xAA 0xAA]) 
+	     '(0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1))
