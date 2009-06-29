@@ -10,7 +10,6 @@
    clojure.contrib.test-is
    com.cryptovide.modmath))
 
-(println "testing combine.clj")
 (simple-test (row 3 0 1) [0 0 1 1])
 
 (simple-test (row 3 2 42) [4 2 1 42])

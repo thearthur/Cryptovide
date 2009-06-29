@@ -6,7 +6,7 @@
  (:use clojure.contrib.math))
 
 (def debug false)
-(def buffer-size 2)
+(def buffer-size 8)
 
 (defstruct secret  :index :block-size :data)
 
@@ -41,30 +41,36 @@
   [bytes len offset]
   (bit-shift-right (bit-and bytes (bit-shift-left (ones len) offset)) offset))
 
+; I dont like passing in a reference to collect the ammount of 
+; padding that was/will-be added to the last block of the sequence.
 (defn block-seq
-  ([block-size bytes]
+  ([block-size bytes padding-ref]
     "reads a byte-seq into a sequence of block-size bits."
-    (block-seq 8 block-size bytes))
-  ([in-block-size out-block-size bytes]
+    (block-seq 8 block-size bytes padding-ref))
+  ([in-block-size out-block-size bytes padding-ref]
     "converts a seq from in-block-size to out-block-size"
-    (block-seq in-block-size out-block-size bytes 0 0 ))
-  ([in-block-size out-block-size bytes bits length]
+    (block-seq in-block-size out-block-size bytes 0 0 padding-ref))
+  ([in-block-size out-block-size bytes bits length padding-ref]
     (if (>= length out-block-size)
       (lazy-seq
         (cons
           (extract-bits bits  out-block-size 0)
           (block-seq in-block-size out-block-size bytes
             (bit-shift-right bits out-block-size)
-            (- length out-block-size))))
-      (let [some-bits  (first bytes)
-            more-bytes (rest bytes)]
-        (assert (< length out-block-size))
-        (if (nil? some-bits)            ;when we cant get more bits
-          (if (= bits 0) nil            ;end the seq if no leftover bits
-            (lazy-seq (cons bits nil))) ;or pad the partial block at the end
-          (block-seq in-block-size out-block-size more-bytes
-            (bit-or bits (bit-shift-left some-bits length))
-            (+ length in-block-size)))))))
+            (- length out-block-size) padding-ref)))
+      (dosync
+       (let [some-bits  (first bytes)
+	     more-bytes (rest bytes)]
+	 (assert (< length out-block-size))
+	 (if (nil? some-bits)             ;when we cant get more bits
+	   (if (= bits 0) 
+	     nil                          ;end the seq if no leftover bits
+	     (do
+	       (alter padding-ref + (- out-block-size length)) 
+	       (lazy-seq (cons bits nil)))) ; pad the partial block at the end
+	   (block-seq in-block-size out-block-size more-bytes
+		      (bit-or bits (bit-shift-left some-bits length))
+		      (+ length in-block-size) padding-ref)))))))
 
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn write-seq-to-file [file & data]
