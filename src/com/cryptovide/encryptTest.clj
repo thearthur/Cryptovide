@@ -14,9 +14,10 @@
   (create-test-file)
   (let [file1 (str input-file-name "1")
         file2 (str input-file-name "2")
-        file3 (str input-file-name "3")]
+        file3 (str input-file-name "3")
+	file4 (str input-file-name "4")]
     (with-fake-prng
-      (encrypt-file input-file-name [file1 file2 file3] 3))
+      (encrypt-file input-file-name [file1 file2 file3 file4] 3))
     (assert-file-contains file1 '(1 8 119 108 106 35 117 122 108 103 112 35
                                    102 119 114 123 115 35 106 116 123 36 111
                                    120 113 117 104 104 37 114 122 106 117 36

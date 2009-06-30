@@ -6,7 +6,7 @@
  (:use clojure.contrib.math))
 
 (def debug false)
-(def buffer-size 8)
+(def default-block-size 8) ;bits
 
 (defstruct secret  :index :block-size :data)
 
@@ -46,7 +46,7 @@
 (defn block-seq
   ([block-size bytes padding-ref]
     "reads a byte-seq into a sequence of block-size bits."
-    (block-seq 8 block-size bytes padding-ref))
+    (block-seq default-block-size block-size bytes padding-ref))
   ([in-block-size out-block-size bytes padding-ref]
     "converts a seq from in-block-size to out-block-size"
     (block-seq in-block-size out-block-size bytes 0 0 padding-ref))
@@ -65,22 +65,19 @@
 	   (if (= bits 0) 
 	     nil                          ;end the seq if no leftover bits
 	     (do
-	       (println "flag")
 	       (alter padding-ref + (- out-block-size length)) ;save the padding
 	       (cons bits nil))) ; pad the partial block at the end
 	   (block-seq in-block-size out-block-size more-bytes
 		      (bit-or bits (bit-shift-left some-bits length))
 		      (+ length in-block-size) padding-ref)))))))
 
-(use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn write-seq-to-file [file & data]
   "writes sequences of things that can be cast to ints, to the open file"
   (when-not (empty? data)
     (doall (map #(. file (write %))
              (if (seq? (first data))
                (map int (first data))
-               (list (int (first data)))
-               )))
+               (list (int (first data))))))
     (recur file (rest data))))
 
 (defn rand-seq

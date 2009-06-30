@@ -5,7 +5,8 @@
  (:gen-class)
  (:use
    com.cryptovide.split
-   com.cryptovide.misc))
+   com.cryptovide.misc
+   [clojure.contrib.duck-streams :only (reader writer)]))
 
 (defn create-header [cyphertext]
   (list (:index cyphertext) (:block-size cyphertext)))
@@ -13,11 +14,10 @@
 (defn create-footer [cyphertext]
   (list (:padding cyphertext)))
 
-(use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn split-file [filename parts threshold]
   (let [padding-ref (ref 0)]
-    (split (block-seq 8 (byte-seq (reader filename)) padding-ref)
-	   parts threshold)))
+    (split (block-seq default-block-size (byte-seq (reader filename)) padding-ref)
+	   threshold parts default-block-size)))
 
 (defn write-file [cyphertext file-name]
   (with-open [file (writer file-name)]
