@@ -54,20 +54,20 @@
     (if (>= length out-block-size)
       (lazy-seq
         (cons
-          (extract-bits bits  out-block-size 0)
-          (block-seq in-block-size out-block-size bytes
-            (bit-shift-right bits out-block-size)
-            (- length out-block-size) padding-ref)))
+	 (extract-bits bits out-block-size 0)
+	 (block-seq in-block-size out-block-size bytes
+		    (bit-shift-right bits out-block-size)
+		    (- length out-block-size) padding-ref)))
       (dosync
        (let [some-bits  (first bytes)
 	     more-bytes (rest bytes)]
-	 (assert (< length out-block-size))
 	 (if (nil? some-bits)             ;when we cant get more bits
 	   (if (= bits 0) 
 	     nil                          ;end the seq if no leftover bits
 	     (do
-	       (alter padding-ref + (- out-block-size length)) 
-	       (lazy-seq (cons bits nil)))) ; pad the partial block at the end
+	       (println "flag")
+	       (alter padding-ref + (- out-block-size length)) ;save the padding
+	       (cons bits nil))) ; pad the partial block at the end
 	   (block-seq in-block-size out-block-size more-bytes
 		      (bit-or bits (bit-shift-left some-bits length))
 		      (+ length in-block-size) padding-ref)))))))

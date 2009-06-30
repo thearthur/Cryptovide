@@ -18,7 +18,8 @@
 (defn read-input-file [open-file]
   (let [index (. open-file read)
         block-size (. open-file read)
-        data (block-seq block-size (byte-seq open-file))]
+	padding (ref 0)
+        data (block-seq block-size (byte-seq open-file) padding)]
     (struct secret index block-size data)))
 
 (defn decrypt-files [file-names]

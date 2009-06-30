@@ -10,9 +10,14 @@
 (defn create-header [cyphertext]
   (list (:index cyphertext) (:block-size cyphertext)))
 
+(defn create-footer [cyphertext]
+  (list (:padding cyphertext)))
+
 (use '[clojure.contrib.duck-streams :only (reader writer)])
 (defn split-file [filename parts threshold]
-  (split (map int (block-seq 8 (byte-seq (reader filename)))) parts threshold))
+  (let [padding-ref (ref 0)]
+    (split (block-seq 8 (byte-seq (reader filename)) padding-ref)
+	   parts threshold)))
 
 (defn write-file [cyphertext file-name]
   (with-open [file (writer file-name)]
