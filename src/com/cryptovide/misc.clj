@@ -3,7 +3,8 @@
        :doc "miscelanios libs"}
  com.cryptovide.misc
  (:gen-class)
- (:use clojure.contrib.math))
+ (:use clojure.contrib.math
+       [clojure.contrib.duck-streams :only (reader writer)]))
 
 (def debug false)
 (def default-block-size 8) ;bits
@@ -22,20 +23,18 @@
     (apply str (map char ints)))
 
 (defn intify [stringy]
- (map int (seq stringy)))
+  (map int (seq stringy)))
 
 (defn byte-seq [rdr]
+  "create a lazy seq of bytes in a file and close the file at the end"
   (let [result (. rdr read)]
     (if (= result -1)
       (do (. rdr close) nil)
       (lazy-seq (cons result (byte-seq rdr))))))
 
-(defn ones
-  ([n] (ones n 1 1))
-  ([n i res]
-    (if (< i n)
-      (recur n (inc i) (bit-set res i))
-      res)))
+(defn ones [n]
+  "create a binary number with this many ones"
+  (- (bit-set 0 n) 1))
 
 (defn extract-bits
   [bytes len offset]
@@ -71,14 +70,64 @@
 		      (bit-or bits (bit-shift-left some-bits length))
 		      (+ length in-block-size) padding-ref)))))))
 
-(defn write-seq-to-file [file & data]
+(defn queue
+  ([] clojure.lang.PersistentQueue/EMPTY)
+  ([& args]
+  (into (queue) args)))
+
+(defn butlast-with-callback
+  "everything up to the n'th element from the end, then evaluates the 
+callback function on the last elements."
+  ([col n callback]
+     (let [[tmp rest-of-col] (split-at n col)
+	   buffer (into  (queue) tmp)]
+	 (butlast-with-callback rest-of-col n callback buffer)))
+  ([col n callback buffer]
+     (if (empty? col) 
+       (do 
+	 (callback buffer)
+	 nil)
+       (lazy-seq
+	 (cons
+	  (first buffer)
+	     (butlast-with-callback 
+	      (rest col) n callback (conj (pop buffer) (first col))))))))
+  
+;this will break if the seq has more than one block of padding
+(defn write-block-seq-old
+  "writes a sequence of blocks to a file"
+  [file-name blocks block-size padding]
+;  (map #(print " "  %)
+       (butlast-with-callback
+	(block-seq block-size 8 blocks (ref 0))
+	(inc (quot block-size 8))
+	#(do (println) (println %))))
+      
+(defn write-block-seq
+  "writes a sequence of blocks to a file"
+  [file-name blocks block-size padding]
+  (with-open [file (writer file-name)]
+    (dorun
+     (map #(print (Integer/toBinaryString %) " ") ;#(. file (write %)) 
+	   (block-seq block-size 8 blocks padding)))
+     (println @padding)))
+    
+
+(defn read-block-seq
+  "reads a sequence of blocks from a file and adds padding"
+  [file-name block-size]
+  (let [rdr (reader file-name)]
+    (block-seq 8 block-size (byte-seq reader))))
+
+(defn write-seq-to-file [file-name & data]
   "writes sequences of things that can be cast to ints, to the open file"
-  (when-not (empty? data)
-    (doall (map #(. file (write %))
-             (if (seq? (first data))
-               (map int (first data))
-               (list (int (first data))))))
-    (recur file (rest data))))
+  (with-open [file (writer file-name)]
+    (when-not (empty? data)
+      (doall (map #(. file (write %))
+		  (if (seq? (first data))
+		    (map int (first data))
+		    (list (int (first data))))))
+      (recur file (rest data)))))
 
 (defn rand-seq
   "produce a lazy sequence of random ints < limit"

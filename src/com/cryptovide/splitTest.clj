@@ -10,7 +10,7 @@
 
 (deftest coificients-test
   "verrify that the coificients are in range"
-  (let [test-values (take test-size coificients)]
+  (let [test-values (take test-size (get-prng))]
     (is (in-range? test-values )
 		  (str "coificient out of range:" test-values))))
 
@@ -23,5 +23,5 @@
 
 (deftest stack-buster-test
   "split a HUGE sequence and see if the stack blows its top"
-  (let [big 100000]
+  (let [big 1000000]
     (time (is (= (count (:data (first (split (repeat big 42) 2 3)))) big)))))
