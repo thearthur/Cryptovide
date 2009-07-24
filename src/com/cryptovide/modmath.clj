@@ -4,9 +4,15 @@
  com.cryptovide.modmath
  (:gen-class))
 
+(defn count-bits [x]
+  (loop [result 1, n x]
+    (if (= 0 n)
+      (dec result)
+      (recur (inc result) (bit-shift-right n 1)))))
 
 ;;(def mody 151157)
 (def mody 719)
+(def field-size (count-bits mody))
 ;;(def mody 11)
 (defn sane? [x]
   "range check on x, throws Exception \"number out of range\""

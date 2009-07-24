@@ -19,14 +19,14 @@
   (let [index (. open-file read)
         block-size (. open-file read)
 	padding (ref 0)
-        data (block-seq block-size (byte-seq open-file) padding)]
-    (struct secret index block-size data)))
+        data (read-block-seq open-file block-size padding)]
+    (struct secret index block-size data padding)))
 
 (defn decrypt-files [file-names]
-  (let [files (open-input-files file-names)
-        cyphertexts (map read-input-file files)]
-    (combine cyphertexts)))
+  (let [files (open-input-files file-names)]
+    (combine (map read-input-file files))))
 
 (defn decrypt-and-save [input-names output-name]
   (with-open [output-file (writer output-name)]
-    (write-seq-to-file output-file (decrypt-files input-names))))
+    (write-block-seq output-file (decrypt-files input-names) )))
+    ;(write-seq-to-file output-file (decrypt-files input-names))))

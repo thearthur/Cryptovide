@@ -8,20 +8,27 @@
    com.cryptovide.misc
    [clojure.contrib.duck-streams :only (reader writer)]))
 
-(defn create-header [cyphertext]
-  (list (:index cyphertext) (:block-size cyphertext)))
+(defn write-header [file cyphertext]
+  (. file (write (int (:index cyphertext))))
+  (. file (write (int (:block-size cyphertext)))))
 
 (defn create-footer [cyphertext]
-  (list (:padding cyphertext)))
+  (byte (:padding cyphertext)))
 
 (defn split-file [filename parts threshold]
   (let [padding-ref (ref 0)]
-    (split (block-seq default-block-size (byte-seq (reader filename)) padding-ref)
-	   threshold parts default-block-size)))
+    (map 
+     #(assoc % :padding padding-ref)
+     (split (block-seq 8 default-block-size
+		       (byte-seq (reader filename)) padding-ref)
+	    threshold parts))))
 
 (defn write-file [cyphertext file-name]
   (with-open [file (writer file-name)]
-      (write-seq-to-file file (create-header cyphertext) (:data cyphertext))))
+    (write-header file cyphertext)
+    (write-block-seq file (:data cyphertext)
+		     (:block-size cyphertext) 
+		     (:padding cyphertext))))
 
 (defn encrypt-file [input-file output-file-names threshold]
   (let [parts (count output-file-names)

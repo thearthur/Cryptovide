@@ -40,7 +40,8 @@
 (defmacro with-fake-prng [ & exprs ]
   "replaces the prng with one that produces consisten results"
   `(binding [com.cryptovide.split/get-prng (fn [] (cycle [1 2 3]))
-             com.cryptovide.modmath/mody 719]
+             com.cryptovide.modmath/mody 719
+	     com.cryptovide.modmath/field-size 10]
      ~@exprs))
 
 (use '[clojure.contrib.duck-streams :only (writer)])

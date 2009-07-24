@@ -4,19 +4,20 @@
  com.cryptovide.misc
  (:gen-class)
  (:use clojure.contrib.math
+       com.cryptovide.modmath
        [clojure.contrib.duck-streams :only (reader writer)]))
 
 (def debug false)
 (def default-block-size 8) ;bits
 
-(defstruct secret  :index :block-size :data)
+(defstruct secret  :index :block-size :data :padding)
 
-(defn my-partition 
-  "like partition except it wont drop the remainder at the end of the seq"
-  [n coll]
-  (when (seq coll)
-    (let [[chunk rest-coll] (split-at n coll)]
-      (lazy-seq (cons chunk (my-partition n rest-coll))))))
+
+(defn bytes-to-int 
+  ([bytes] (bytes-to-int 4 bytes))
+  ([num bytes] 
+     (let [powers (take num (iterate #(* % 256) 1))]
+       (reduce + 0 (map * bytes powers)))))
 
 (defn stringify [ints]
   "maps a seq of ints into a string"
@@ -61,7 +62,7 @@
        (let [some-bits  (first bytes)
 	     more-bytes (rest bytes)]
 	 (if (nil? some-bits)             ;when we cant get more bits
-	   (if (= bits 0) 
+	   (if (= length 0) 
 	     nil                          ;end the seq if no leftover bits
 	     (do
 	       (alter padding-ref + (- out-block-size length)) ;save the padding
@@ -104,20 +105,23 @@ callback function on the last elements."
 	#(do (println) (println %))))
       
 (defn write-block-seq
-  "writes a sequence of blocks to a file"
-  [file-name blocks block-size padding]
-  (with-open [file (writer file-name)]
+  "writes a sequence of blocks to a file and appends the trailer"
+  [file blocks block-size padding-ref]
     (dorun
-     (map #(print (Integer/toBinaryString %) " ") ;#(. file (write %)) 
-	   (block-seq block-size 8 blocks padding)))
-     (println @padding)))
-    
+     (lazy-cat
+      (map #(. file (write %))
+	   (block-seq block-size 8 blocks padding-ref))
+      (map #(. file (write %))
+	   (block-seq 32 8 (list (int @padding-ref)) (ref 0))))))
 
 (defn read-block-seq
   "reads a sequence of blocks from a file and adds padding"
-  [file-name block-size]
-  (let [rdr (reader file-name)]
-    (block-seq 8 block-size (byte-seq reader))))
+  [rdr block-size padding-ref]
+  (block-seq 8 block-size 
+	     (butlast-with-callback
+	      (byte-seq rdr) ; this will close rdr
+	      4
+	      #(dosync (commute padding-ref + (bytes-to-int %)))) padding-ref))
 
 (defn write-seq-to-file [file-name & data]
   "writes sequences of things that can be cast to ints, to the open file"

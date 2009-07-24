@@ -19,5 +19,3 @@
  'com.cryptovide.cryptovideTest)
 
 (cryptovideTest)
-
-(dosync (ref-set pad 0))                     (map #(java.lang.Integer/toBinaryString %) (block-seq 8 21 [0xAA 0xFF 0xFA] pad))

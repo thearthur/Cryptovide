@@ -29,11 +29,11 @@
       (is (= test-data result)))
     (is (thrown? Exception (. test-file read)))))
 
-(simple-test (block-seq 8 3 [1] (ref 0)) '(1 0))
+(simple-test (block-seq 8 3 [1] (ref 0)) '(1 0 0))
 (simple-test (block-seq 8 8 [1 2 3 4] (ref 0)) '(1 2 3 4))
 (simple-test (block-seq 8 [1 2 3 4] (ref 0))  '(1 2 3 4))
 (simple-test (block-seq 8 8 [] (ref 0)) nil)
-;(simple-test (block-seq 8 [0xAA 0xFF] (ref 0)) '(170 255))
+(simple-test (block-seq 8 [0xAA 0xFF] (ref 0)) '(170 255))
 (simple-test (block-seq 1 [0xAA 0xAA] (ref 0)) 
 	     '(0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1))
 
@@ -41,3 +41,19 @@
   (let [padding-ref (ref 0)]
     (dorun (block-seq 8 21 [0xAA 0xAA 0xAA] padding-ref))
     (is (= @padding-ref 18))))
+
+(simple-test 
+ (block-seq 8 32 (block-seq 32 8 [32769] (ref 0)) (ref 0))
+ '(32769))
+
+(simple-test 
+ (bytes-to-int [0 0 1]) 65536)
+
+(simple-test
+ (bytes-to-int [0 0 0 ]) 0)
+
+(simple-test
+ (bytes-to-int []) 0)
+
+(simple-test 
+ (bytes-to-int (block-seq 32 8 [4] (ref 0))) 4)
