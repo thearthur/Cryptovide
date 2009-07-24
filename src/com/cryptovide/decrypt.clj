@@ -28,5 +28,4 @@
 
 (defn decrypt-and-save [input-names output-name]
   (with-open [output-file (writer output-name)]
-    (write-block-seq output-file (decrypt-files input-names) )))
-    ;(write-seq-to-file output-file (decrypt-files input-names))))
+    (dorun (write-seq-to-file output-file (decrypt-files input-names)))))
