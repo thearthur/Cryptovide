@@ -2,6 +2,7 @@
    #^{:author "Arthur Ulfeldt", 
      :doc "Defines the common modulous and common math opperators that use it"}
  com.cryptovide.modmath
+ (:use clojure.contrib.lazy-seqs)
  (:gen-class))
 
 (defn count-bits [x]
@@ -10,8 +11,13 @@
       (dec result)
       (recur (inc result) (bit-shift-right n 1)))))
 
-;;(def mody 151157)
-(def mody 719)
+(defmacro set-mody [bits]
+  `(def mody ~(first (filter #(>= (count-bits %) 24) primes))))
+(set-mody 18)
+(println mody)
+
+;(def mody 151157)
+;;(def mody 719)
 (def field-size (count-bits mody))
 ;;(def mody 11)
 (defn sane? [x]

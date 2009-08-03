@@ -26,6 +26,6 @@
   (let [files (open-input-files file-names)]
     (combine (map read-input-file files))))
 
-(defn decrypt-and-save [input-names output-name]
+(defn decrypt [input-names output-name]
   (with-open [output-file (writer output-name)]
     (dorun (write-seq-to-file output-file (decrypt-files input-names)))))

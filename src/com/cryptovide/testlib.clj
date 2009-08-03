@@ -63,3 +63,15 @@
 (defn assert-file-contains [file expected]
 "checks a files contens against a string"
   (is (= expected (intify (slurp file)))))
+
+(comment
+(defn try-size [size]
+  (binding [com.cryptovide.modmath/mody 
+	    (first (filter #(>= (count-bits %) size) primes))
+	    com.cryptovide.modmath/field-size size]
+     (with-out-str 
+       (time (dorun (:data 
+		     (first (split 
+			     (block-seq 8 size (range 5000000) (ref 0)) 2 3))))))))
+(map #(try-size %) (range 8 129))
+)
