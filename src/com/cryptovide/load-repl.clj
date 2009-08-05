@@ -16,6 +16,7 @@
  'com.cryptovide.miscTest
  'com.cryptovide.decryptTest
  'com.cryptovide.testlib
- 'com.cryptovide.cryptovideTest)
+ 'com.cryptovide.cryptovideTest
+ 'com.cryptovide.gui)
 
 (cryptovideTest)
