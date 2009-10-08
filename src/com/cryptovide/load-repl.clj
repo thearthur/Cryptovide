@@ -20,3 +20,7 @@
  'com.cryptovide.gui)
 
 (cryptovideTest)
+
+(use 
+ :reload-all
+ 'com.cryptovide.gui)

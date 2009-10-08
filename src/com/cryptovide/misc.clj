@@ -44,32 +44,31 @@
 ; I dont like passing in a reference to collect the ammount of 
 ; padding that was/will-be added to the last block of the sequence.
 (defn block-seq
-  ([block-size bytes padding-ref]
-    "reads a byte-seq into a sequence of block-size bits."
-    (block-seq default-block-size block-size bytes padding-ref))
-  ([in-block-size out-block-size bytes padding-ref]
-    "converts a seq from in-block-size to out-block-size"
-    (block-seq in-block-size out-block-size bytes 0 0 padding-ref))
-  ([in-block-size out-block-size bytes bits length padding-ref]
-    (if (>= length out-block-size)
-      (lazy-seq
-        (cons
-	 (extract-bits bits out-block-size 0)
-	 (block-seq in-block-size out-block-size bytes
-		    (bit-shift-right bits out-block-size)
-		    (- length out-block-size) padding-ref)))
-      (dosync
-       (let [some-bits  (first bytes)
-	     more-bytes (rest bytes)]
-	 (if (nil? some-bits)             ;when we cant get more bits
-	   (if (= length 0) 
-	     nil                          ;end the seq if no leftover bits
-	     (do
-	       (alter padding-ref + (- out-block-size length)) ;save the padding
-	       (cons bits nil))) ; pad the partial block at the end
-	   (block-seq in-block-size out-block-size more-bytes
-		      (bit-or bits (bit-shift-left some-bits length))
-		      (+ length in-block-size) padding-ref)))))))
+  "converts a seq from in-block-size to out-block-size"
+  [in-block-size out-block-size bytes padding-ref]
+  (letfn [(make-seq 
+	   ([in-block-size out-block-size bytes bits length padding-ref]
+	     (if (>= length out-block-size)
+	       (lazy-seq
+		 (cons
+		  (extract-bits bits out-block-size 0)
+		  (make-seq in-block-size out-block-size bytes
+			     (bit-shift-right bits out-block-size)
+			     (- length out-block-size) padding-ref)))
+	       (dosync
+		(let [some-bits  (first bytes)
+		      more-bytes (rest bytes)]
+		  (if (nil? some-bits)             ;when we cant get more bits
+		    (if (= length 0) 
+		      nil                          ;end the seq if no leftover bits
+		      (do
+			(alter padding-ref + (- out-block-size length)) ;save the padding
+			(cons bits nil))) ; pad the partial block at the end
+		    (make-seq in-block-size out-block-size more-bytes
+			       (bit-or bits (bit-shift-left some-bits length))
+			       (+ length in-block-size) padding-ref)))))))]
+    (make-seq in-block-size out-block-size bytes 0 0 padding-ref)))
+
 
 (defn queue
   ([] clojure.lang.PersistentQueue/EMPTY)

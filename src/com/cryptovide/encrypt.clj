@@ -3,9 +3,7 @@
      :doc "splits input files into secrets and writes output files"}
  com.cryptovide.encrypt
  (:gen-class)
- (:use
-   com.cryptovide.split
-   com.cryptovide.misc
+ (:use com.cryptovide.split com.cryptovide.misc
    [clojure.contrib.duck-streams :only (reader writer)]))
 
 (defn write-header [file cyphertext]

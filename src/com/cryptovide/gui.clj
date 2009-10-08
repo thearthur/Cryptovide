@@ -7,48 +7,64 @@
 	   (java.awt.event ActionListener)
 	   (java.awt GridLayout)))
 
-(defn gui []
-  (let [frame (JFrame. "Cryptovide")
+(def gui-context (ref {:frame nil 
+		       :grid [3 1 1 1] 
+		       :input-file "name your file"
+		       :num-outputs 2
+		       :out-names ["file-name" "file name"]
+		       :x-size 200
+		       :y-size 300
+		       :threshold 2}))
+(defn setup-gui []
+  (dosync 
+   (commute gui-context 
+	    assoc :frame (JFrame. "Cryptovide"))))
+
+(declare update-gui)
+(defn gui-thing [todo] 
+  (do
+    (todo)
+    (update-gui)))
+
+(defn add-output-file []
+  (dosync
+   (ref-set gui-context 
+	    (assoc @gui-context 
+	      :x-size (+ (:x-size @gui-context) 100)
+	      :out-names (cons "new name" (:out-names @gui-context))))))
+
+(defn update-gui []
+  (let [frame (:frame @gui-context)
 	input-filename (JTextField.)
 	input-lable (JLabel. "Input Name")
 	go-button (JButton. "GO!")
-	new-out-name (fn [] (JLabel. "Out Name"))
-	new-out-box (fn [] (JTextField.))
+	add-file-button (JButton. "bad-ui-thing")
 	blabla (JLabel. "blabla")]
     (.addActionListener go-button
        (proxy [ActionListener] []
 	 (actionPerformed [event]
-			  (let [name (.getText input-filename)]
-			    (.setText blabla name)))))
+			  (gui-thing 
+			   #(let [name (.getText input-filename)]
+			      (.setText blabla name))))))
+    (.addActionListener add-file-button
+       (proxy [ActionListener] []
+	 (actionPerformed [event]
+			  (gui-thing 
+			   #(add-output-file)))))
     (doto frame
-      (.setLayout (GridLayout. 2 2 3 3))
+      (.setLayout (apply #(GridLayout. %1 %2 %3 %4) (:grid @gui-context)))
       (.add input-lable)
       (.add input-filename)
       (.add go-button)
-      (.add (new-out-name))
-      (.add (new-out-box))
-      (.add blabla)
-      (.setSize 300 80)
-      (.setVisible true))))
+      (.add add-file-button))
+      (doall (map (fn [name, i]
+		    (letfn [(new-out-name [n] (JLabel. (str "file " n)))
+			    (new-out-box  [_] (JTextField.))]
+		      (. frame add (new-out-name i))
+		      (. frame add (new-out-box name))))
+		  (:out-names @gui-context)
+		  (range 1)))
+      (doto frame
+	(.setSize (@gui-context :y-size) (@gui-context :x-size))
+	(.setVisible true))))
 
-;--------------------------------------------------------------------
-(defn celsius []
-  (let [frame (JFrame. "Celsius Converter")
-        temp-text (JTextField.)
-        celsius-label (JLabel. "Celsius")
-        convert-button (JButton. "Convert")
-        fahrenheit-label (JLabel. "Fahrenheit")]
-    (.addActionListener convert-button
-      (proxy [ActionListener] []
-        (actionPerformed [evt]
-          (let [c (Double/parseDouble (.getText temp-text))]
-            (.setText fahrenheit-label
-               (str (+ 32 (* 1.8 c)) " Fahrenheit"))))))
-    (doto frame
-      (.setLayout (GridLayout. 2 2 3 3))
-      (.add temp-text)
-      (.add celsius-label)
-      (.add convert-button)
-      (.add fahrenheit-label)
-      (.setSize 300 80)
-      (.setVisible true))))

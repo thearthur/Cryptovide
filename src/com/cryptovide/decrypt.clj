@@ -8,6 +8,8 @@
    com.cryptovide.combine
    [clojure.contrib.duck-streams :only (reader writer)]))
 
+(def file-block-size 8)
+
 (defn open-input-file [file-name]
   (try (reader file-name)
     (catch Exception e (println e))))
