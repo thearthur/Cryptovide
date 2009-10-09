@@ -56,3 +56,9 @@
 
 (simple-test 
  (bytes-to-int (block-seq 32 8 [4] (ref 0))) 4)
+
+(deftest test-butlast-with-callback
+  (let [tail (atom ())]
+    (is (= (doall (butlast-with-callback (range 20) 15 #(swap! tail (fn [_] %))))))
+    (is (= (range 5 20) @tail))))
+    

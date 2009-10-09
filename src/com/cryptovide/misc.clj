@@ -79,29 +79,19 @@
   "everything up to the n'th element from the end, then evaluates the 
 callback function on the last elements."
   ([col n callback]
-     (let [[tmp rest-of-col] (split-at n col)
-	   buffer (into  (queue) tmp)]
-	 (butlast-with-callback rest-of-col n callback buffer)))
-  ([col n callback buffer]
-     (if (empty? col) 
-       (do 
-	 (callback buffer)
-	 nil)
-       (lazy-seq
-	 (cons
-	  (first buffer)
-	     (butlast-with-callback 
-	      (rest col) n callback (conj (pop buffer) (first col))))))))
-  
-;this will break if the seq has more than one block of padding
-(defn write-block-seq-old
-  "writes a sequence of blocks to a file"
-  [file-name blocks block-size padding]
-;  (map #(print " "  %)
-       (butlast-with-callback
-	(block-seq block-size 8 blocks (ref 0))
-	(inc (quot block-size 8))
-	#(do (println) (println %))))
+     (letfn [(helper [col n callback buffer]
+		     (if (empty? col) 
+		       (do 
+			 (callback buffer)
+			 nil)
+		       (lazy-seq
+			 (cons
+			  (first buffer)
+			  (helper
+			   (rest col) n callback (conj (pop buffer) (first col)))))))]
+       (let [[tmp rest-of-col] (split-at n col)
+	     buffer (into  (queue) tmp)]
+	 (helper rest-of-col n callback buffer)))))
       
 (defn write-block-seq
   "writes a sequence of blocks to a file and appends the trailer"
