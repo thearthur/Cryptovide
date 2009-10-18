@@ -1,6 +1,7 @@
 (add-classpath "file:///home/arthur/Desktop/hg/src/")
 (add-classpath "file:///home/arthur/Desktop/hg/build/")
 
+
 (use 
  :reload-all
  'com.cryptovide.modmath
@@ -20,6 +21,7 @@
  'com.cryptovide.gui)
 
 (cryptovideTest)
+(do (build) (cryptovideTest))
 
 (use 
  :reload-all

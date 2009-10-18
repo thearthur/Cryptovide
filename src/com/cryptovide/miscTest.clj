@@ -62,3 +62,25 @@
     (is (= (doall (butlast-with-callback (range 20) 15 #(swap! tail (fn [_] %))))))
     (is (= (range 5 20) @tail))))
     
+(defn assert-test-seq-counter [len n]
+  (let [progress (atom 0)
+	seqy (seq-counter (range len) n #(swap! progress inc))]
+    (is (= @progress 0))
+    (doall seqy)
+    @progress))
+
+(deftest test-seq-counter
+  (is (= (assert-test-seq-counter 53 3) 17))
+  (is (= (assert-test-seq-counter 3 3) 1))
+  (is (= (assert-test-seq-counter 1 3) 0))
+  (is (= (assert-test-seq-counter 0 0) 0))
+  (is (= (assert-test-seq-counter 0 1) 0)))
+
+(deftest test-seq-counter-with-finish-callback
+  (let [progress (atom 0)
+	finished (atom false)]
+    (doall (seq-counter (range 10) 2 #(swap! progress inc) #(reset! finished true)))
+    (is (= @progress 5))
+    (is (= @finished true))))
+  
+  

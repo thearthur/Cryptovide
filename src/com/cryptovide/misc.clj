@@ -133,3 +133,11 @@ callback function on the last elements."
                (. prng nextInt limit)
                (. prng nextInt))
          (rand-seq limit prng)))))
+
+(defn seq-counter 
+  "calls callback after every n'th entry in sequence is evaluated. Optionally takes another callback to call once the seq is fully evaluated."
+  ([sequence n callback]
+     (map #(do (if (= (rem %1 n) 0) (callback)) %2) (iterate inc 1) sequence))
+  ([sequence n callback finished-callback]
+     (drop-last (lazy-cat (seq-counter sequence n callback) 
+			  (lazy-seq (cons (finished-callback) ()))))))
