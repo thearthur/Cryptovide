@@ -21,8 +21,8 @@
    'com.cryptovide.gui))
 
 (build)
-(cryptovideTest)
-(do (build) (cryptovideTest))
+;(cryptovideTest)
+;(do (build) (cryptovideTest))
 
 ;(use
 ; :reload-all
