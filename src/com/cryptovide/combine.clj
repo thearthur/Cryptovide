@@ -63,4 +63,4 @@
 
 (defn combine [answers]
   (when-not (empty? answers)
-    (map solve (matrices answers))))
+    (pmap solve (matrices answers))))

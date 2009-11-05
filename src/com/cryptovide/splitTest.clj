@@ -23,5 +23,4 @@
 
 (deftest stack-buster-test
   "split a HUGE sequence and see if the stack blows its top"
-  (let [big 1000000]
-    (time (is (= (count (:data (first (split (repeat big 42) 2 3)))) big)))))
+    (time (is (= (count (:data (first (split (repeat big 42) 2 3)))) big))))

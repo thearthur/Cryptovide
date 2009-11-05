@@ -10,7 +10,7 @@
 
 (def input-file-name "/tmp/testfile")
 (def test-size 1000)
-
+(def big 1000000)
 
 (defn test-numbers []
   (take test-size (rand-seq mody)))

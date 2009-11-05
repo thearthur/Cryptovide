@@ -12,9 +12,9 @@
       (recur (inc result) (bit-shift-right n 1)))))
 
 (defmacro set-mody [bits]
-  `(def mody ~(first (filter #(>= (count-bits %) 24) primes))))
-(set-mody 18)
-(println mody)
+  `(def mody ~(first (filter #(>= (count-bits %) bits) primes))))
+;(set-mody 24)
+(def mody 8388617)
 
 ;(def mody 151157)
 ;;(def mody 719)
