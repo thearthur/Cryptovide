@@ -1,5 +1,5 @@
-(add-classpath "file:///home/arthur/Desktop/hg/src/")
-(add-classpath "file:///home/arthur/Desktop/hg/build/")
+;(add-classpath "file:///home/arthur/Desktop/hg/src/")
+;(add-classpath "file:///home/arthur/Desktop/hg/build/")
 
 (defmacro build []
   '(use 
@@ -21,9 +21,9 @@
    'com.cryptovide.gui))
 
 (build)
-(cryptovideTest)
-(do (build) (cryptovideTest))
+;(cryptovideTest)
+;(do (build) (cryptovideTest))
 
-(use 
- :reload-all
- 'com.cryptovide.gui)
+;(use
+; :reload-all
+; 'com.cryptovide.gui)
