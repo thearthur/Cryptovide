@@ -6,7 +6,7 @@
    :reload-all
    'com.cryptovide.modmath
    'com.cryptovide.combine
-   'com.cryptovide.split
+;   'com.cryptovide.split
    'com.cryptovide.encrypt
    'com.cryptovide.misc
    'com.cryptovide.decrypt
