@@ -14,9 +14,6 @@
        chunk (partition (dec threshold) coificients)))
 
 (def chunk-size 3000)
-(defmacro pmap-chunks [f chunk-size & sequences]
-  `(apply concat (pmap f 
-		      (map #(partition chunk-size chunk-size () %) ~@sequences))
 		      
 (defn split-chunks [secrets threshold x coificients]
   (apply concat
