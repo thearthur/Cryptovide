@@ -45,6 +45,6 @@
 	unsplits (combine splits)]
     (is (= numbers unsplits) "faied to combine")))
 
-(deftest time-test
-  (time (dorun (combine (split (range big) 4 4)))))
+;(deftest time-test
+;  (time (dorun (combine (split (range big) 4 4)))))
 
