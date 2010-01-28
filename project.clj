@@ -1,4 +1,4 @@
-(defproject com.cryptovide "0.1"
+(defproject cryptovide "0.1"
     :dependencies [[org.clojure/clojure
                       "1.1.0-master-SNAPSHOT"]
                    [org.clojure/clojure-contrib
