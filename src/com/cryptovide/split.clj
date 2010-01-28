@@ -16,24 +16,12 @@
 (def chunk-size 3000)
 		      
 (defn split-chunks [secrets threshold x coificients]
-  (apply concat
+  (flatten
    (map #(split-chunk %1 threshold x %2)
 	(partition chunk-size chunk-size () secrets)
 	(partition (* chunk-size 
 		      (max 1 (dec threshold))) 
 		   coificients))))
-
-;not sure is this function is necessasary
-(defn lazy-apply-cat [[cur & more :as seqs]]
-  "returns a lazy seq that's like (apply concat list-o-seqs)"
-  (if (empty? seqs) 
-    nil
-    (if (empty? cur)
-      (lazy-apply-cat (rest seqs))
-      (lazy-seq 
-	(cons
-	 (first cur)
-	 (lazy-apply-cat (cons (rest cur) more)))))))
 
 (defn split 
   ([secrets threshold parts]
