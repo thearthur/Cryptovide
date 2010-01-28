@@ -19,7 +19,9 @@
   (apply concat
    (map #(split-chunk %1 threshold x %2)
 	(partition chunk-size chunk-size () secrets)
-	(partition (* chunk-size (dec threshold)) coificients))))
+	(partition (* chunk-size 
+		      (max 1 (dec threshold))) 
+		   coificients))))
 
 ;not sure is this function is necessasary
 (defn lazy-apply-cat [[cur & more :as seqs]]
