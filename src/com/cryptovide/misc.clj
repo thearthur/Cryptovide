@@ -12,6 +12,8 @@
 ;;
 ;;     You should have received a copy of the GNU General Public License
 ;;     along with Cryptovide.  If not, see <http://www.gnu.org/licenses/>.
+;;
+;;     copyright Arthur Ulfeldt 2010
 
 (ns 
  #^{:author "Arthur Ulfeldt", 
