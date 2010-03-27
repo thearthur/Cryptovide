@@ -26,6 +26,10 @@
 (with-fake-prng
   (encrypt-file in-file [out-file1 out-file2] 2))
 
+(deftest test-read-header 
+  (is (= (read-header (open-input-file "/tmp/testfile_encrypted_1"))
+	 {:index 1, :block-size 10})))
+
 (deftest test-read-input-file
   (with-fake-prng 
    (let [ugly-hack (ref 0)]
