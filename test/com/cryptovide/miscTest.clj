@@ -1,3 +1,4 @@
+
 ;; This file is part of Cryptovide.
 ;;
 ;;     Cryptovide is free software: you can redistribute it and/or modify
@@ -73,6 +74,18 @@
 
 (simple-test 
  (bytes-to-int (block-seq 32 8 [4] (ref 0))) 4)
+
+(simple-test
+ (int-to-bytes 256) [(byte 0) (byte 1)])
+
+(simple-test
+ (int-to-bytes 255) [(byte 255)])
+
+(simple-test
+ (int-to-bytes 254) [(byte 254)])
+
+(simple-test
+ (int-to-bytes 0) [0])
 
 (deftest test-butlast-with-callback
   (let [tail (atom ())]

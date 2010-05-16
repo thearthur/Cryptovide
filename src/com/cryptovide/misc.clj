@@ -30,15 +30,23 @@
 (defstruct secret  :index :block-size :data :padding)
 
 
-(defn bytes-to-int 
+(defn bytes-to-int
+  "Converts a LEAST SIGNIFICANT BYTE FIRST sequence of BYTES to a whole Number"
   ([bytes] (bytes-to-int 4 bytes))
   ([num bytes] 
      (let [powers (take num (iterate #(* % 256) 1))]
        (reduce + 0 (map * bytes powers)))))
 
-(defn stringify [ints]
-  "maps a seq of ints into a string"
-    (apply str (map char ints)))
+(defn int-to-bytes
+  "Converts a whole number to a LEAST SIGNIFICANT BYTE FIRST sequence of bytes"
+  ([inty]
+     (if (= inty 0)
+       [(byte 0)]
+       (int-to-bytes inty [])))
+  ([inty bytes]
+     (if (= 0 inty)
+       bytes
+       (recur (quot inty 256) (conj bytes (byte (rem inty 256)))))))
 
 (defn intify [stringy]
   (map int (seq stringy)))
