@@ -20,6 +20,7 @@
        :doc "miscelanios libs"}
  com.cryptovide.misc
  (:gen-class)
+ (:import java.security.SecureRandom)
  (:use clojure.contrib.math
        com.cryptovide.modmath
        [clojure.contrib.duck-streams :only (reader writer)]))
@@ -29,20 +30,23 @@
 
 (defstruct secret  :index :block-size :data :padding)
 
+(defn byte-to-int [byte]
+  (if (neg? byte)
+    (+ byte 256)
+    byte))
 
-(defn bytes-to-int
+(defn bytes-to-number [bytes] 
   "Converts a LEAST SIGNIFICANT BYTE FIRST sequence of BYTES to a whole Number"
-  ([bytes] (bytes-to-int 4 bytes))
-  ([num bytes] 
-     (let [powers (take num (iterate #(* % 256) 1))]
-       (reduce + 0 (map * bytes powers)))))
+  (let [powers (iterate #(* % 256) 1)
+        unsigned-bytes (map byte-to-int bytes)]
+    (reduce + 0 (map * unsigned-bytes powers))))
 
-(defn int-to-bytes
-  "Converts a whole number to a LEAST SIGNIFICANT BYTE FIRST sequence of bytes"
+(defn number-to-bytes
+  "Converts a posative whole number to a LEAST SIGNIFICANT BYTE FIRST sequence of bytes"
   ([inty]
      (if (= inty 0)
        [(byte 0)]
-       (int-to-bytes inty [])))
+       (number-to-bytes inty [])))
   ([inty bytes]
      (if (= 0 inty)
        bytes
@@ -66,33 +70,42 @@
   [bytes len offset]
   (bit-shift-right (bit-and bytes (bit-shift-left (ones len) offset)) offset))
 
+(defn bit-shift-right-without-java-bugs [x n]
+  "some jvms think that 1>>32*k = 1 (for all values of k)"
+  (if (= 0 (rem n 32))
+    0
+    (bit-shift-right x n)))
+
 ; I dont like passing in a reference to collect the ammount of 
 ; padding that was/will-be added to the last block of the sequence.
 (defn block-seq
   "converts a seq from in-block-size to out-block-size"
-  [in-block-size out-block-size bytes padding-ref]
-  (letfn [(make-seq 
-	   ([in-block-size out-block-size bytes bits length padding-ref]
-	     (if (>= length out-block-size)
-	       (lazy-seq
-		 (cons
-		  (extract-bits bits out-block-size 0)
-		  (make-seq in-block-size out-block-size bytes
-			     (bit-shift-right bits out-block-size)
-			     (- length out-block-size) padding-ref)))
-	       (dosync
-		(let [some-bits  (first bytes)
-		      more-bytes (rest bytes)]
-		  (if (nil? some-bits)             ;when we cant get more bits
-		    (if (= length 0) 
-		      nil                          ;end the seq if no leftover bits
-		      (do
-			(alter padding-ref + (- out-block-size length)) ;save the padding
-			(cons bits nil))) ; pad the partial block at the end
-		    (make-seq in-block-size out-block-size more-bytes
-			       (bit-or bits (bit-shift-left some-bits length))
-			       (+ length in-block-size) padding-ref)))))))]
-    (make-seq in-block-size out-block-size bytes 0 0 padding-ref)))
+  ([in-block-size out-block-size bytes]
+     (block-seq in-block-size out-block-size bytes (ref 0)))
+  ([in-block-size out-block-size bytes padding-ref]
+     (letfn [(make-seq 
+              ([in-block-size out-block-size bytes bits length padding-ref]
+                                        ;              (println "bits:"bits "length:"length)
+                 (if (>= length out-block-size)
+                   (lazy-seq
+                     (cons
+                      (extract-bits bits out-block-size 0)
+                      (make-seq in-block-size out-block-size bytes
+                                (bit-shift-right-without-java-bugs bits out-block-size)
+                                (- length out-block-size) padding-ref)))
+                   (dosync
+                    (let [some-bits  (first bytes)
+                          more-bytes (rest bytes)]
+                      (if (nil? some-bits) ;when we cant get more bits
+                        (if (= length 0) 
+                          nil         ;end the seq if no leftover bits
+                          (do
+                            (commute padding-ref + (- out-block-size length)) ;save the padding
+                            (cons bits nil))) ; pad the partial block at the end
+                        (make-seq in-block-size out-block-size more-bytes
+                                  (bit-or bits (bit-shift-left some-bits length))
+                                  (+ length in-block-size) padding-ref)))))))]
+       (make-seq in-block-size out-block-size bytes 0 0 padding-ref))))
 
 
 (defn queue
@@ -123,7 +136,7 @@ callback function on the last elements."
   [file blocks block-size padding-ref]
     (dorun
      (lazy-cat
-      (map #(. file (write %))
+      (map #(. file (write (int %)))
 	   (block-seq block-size 8 blocks padding-ref))
       (map #(. file (write %))
 	   (block-seq 32 8 (list (int @padding-ref)) (ref 0))))))
@@ -135,7 +148,8 @@ callback function on the last elements."
 	     (butlast-with-callback
 	      (byte-seq rdr) ; this will close rdr
 	      4
-	      #(dosync (commute padding-ref + (bytes-to-int %)))) padding-ref))
+	      #(dosync (commute padding-ref + (bytes-to-number %))))
+             padding-ref))
 
 (defn write-seq-to-file [file-name & data]
   "writes sequences of things that can be cast to ints, to the open file"
@@ -147,17 +161,38 @@ callback function on the last elements."
 		    (list (int (first data))))))
       (recur file (rest data)))))
 
+
+(defn new-secure-random-generator []
+  (SecureRandom/getInstance "SHA1PRNG"))
+
+(defn rand-int-seq
+  "produce a lazy sequence of random 31 bit posative ints"
+  ([]
+     (rand-int-seq (new-secure-random-generator)))
+  ([prng]
+     (repeatedly #(. prng nextInt))))
+
+(defn make-pos [numbers]
+  "make a sequence of number all positive."
+  (map #(if (neg? %) (* -1 %) %) numbers))
+
 (defn rand-seq
-  "produce a lazy sequence of random ints < limit"
-  ([] (rand-seq nil (new java.util.Random)))
+  "produce a lazy sequence of arbitraryly large random numbers"
+  ([] (rand-seq nil))
   ([limit]
-     (rand-seq limit (new java.util.Random)))
-  ([limit prng]
-     (lazy-seq
-       (cons (if limit
-               (. prng nextInt limit)
-               (. prng nextInt))
-         (rand-seq limit prng)))))
+     (let [number-of-output-bits
+           (if (nil? limit)
+             32
+             (count-bits limit))
+           random-numbers
+           (let [random-31-bit-ints (make-pos (rand-int-seq))]
+             (block-seq 31
+                        number-of-output-bits
+                        random-31-bit-ints))]
+       (if (nil? limit)
+         random-numbers
+         (filter #(< % limit) random-numbers)))))
+
 
 (defn seq-counter 
   "calls callback after every n'th entry in sequence is evaluated. 
@@ -166,9 +201,10 @@ callback function on the last elements."
      (map #(do (if (= (rem %1 n) 0) (callback)) %2) (iterate inc 1) sequence))
   ([sequence n callback finished-callback]
      (drop-last (lazy-cat (seq-counter sequence n callback) 
-			  (lazy-seq (cons (finished-callback) ()))))))
+                          (lazy-seq (cons (finished-callback) ()))))))
 
 ;co rich hicky from the clojure mailing list
+  
 (defn flatten [x] 
   (let [s? #(instance? clojure.lang.Sequential %)]
     (filter (complement s?) (tree-seq s? seq x))))

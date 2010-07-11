@@ -29,14 +29,19 @@
       (recur (inc result) (bit-shift-right n 1)))))
 
 (defmacro set-mody [bits]
+  "this was too slow"
   `(def mody ~(first (filter #(>= (count-bits %) bits) primes))))
 ;(set-mody 24)
-(def mody 8388617)
+;(def mody 8388617)
+
+;a 63 bit prime
+(def mody 5742664875401159929)
 
 ;(def mody 151157)
 ;;(def mody 719)
 (def field-size (count-bits mody))
 ;;(def mody 11)
+
 (defn sane? [x]
   "range check on x, throws Exception \"number out of range\""
   (if (or (>= x mody) (neg? x))

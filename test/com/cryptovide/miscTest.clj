@@ -53,6 +53,13 @@
 (simple-test (block-seq 8 8 [0xAA 0xFF] (ref 0)) '(170 255))
 (simple-test (block-seq 8 1 [0xAA 0xAA] (ref 0)) 
 	     '(0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1))
+(simple-test (block-seq 32 32 [1 2 3 4 5 6 7] (ref 0))
+             '(1 2 3 4 5 6 7))
+(simple-test (block-seq 32 128 [1 0 0 0 1 0 0 0] (ref 0))
+             '(1 1))
+
+(deftest test-bit-shift-right
+  (is (= (bit-shift-right 1 32) 0)))
 
 (deftest test-block-padding 
   (let [padding-ref (ref 0)]
@@ -63,29 +70,38 @@
  (block-seq 8 32 (block-seq 32 8 [32769] (ref 0)) (ref 0))
  '(32769))
 
+(simple-test
+ (bytes-to-number [0 0 1]) 65536)
+
+(simple-test
+ (bytes-to-number [0 0 0 ]) 0)
+
+(simple-test
+ (bytes-to-number []) 0)
+
 (simple-test 
- (bytes-to-int [0 0 1]) 65536)
+ (bytes-to-number (block-seq 32 8 [4] (ref 0))) 4)
 
 (simple-test
- (bytes-to-int [0 0 0 ]) 0)
+ (number-to-bytes 256) [(byte 0) (byte 1)])
 
 (simple-test
- (bytes-to-int []) 0)
-
-(simple-test 
- (bytes-to-int (block-seq 32 8 [4] (ref 0))) 4)
+ (number-to-bytes 255) [(byte 255)])
 
 (simple-test
- (int-to-bytes 256) [(byte 0) (byte 1)])
+ (number-to-bytes 254) [(byte 254)])
 
 (simple-test
- (int-to-bytes 255) [(byte 255)])
+ (number-to-bytes 0) [0])
 
-(simple-test
- (int-to-bytes 254) [(byte 254)])
-
-(simple-test
- (int-to-bytes 0) [0])
+(deftest number-to-bytes-to-number
+  (let [lots-of-big-numbers (map #(if (neg? %) (* -1 %) %)
+                                 (big-test-numbers))]
+    (dorun (map #(is (= (-> %
+                            number-to-bytes
+                            bytes-to-number)
+                        %))
+                lots-of-big-numbers))))
 
 (deftest test-butlast-with-callback
   (let [tail (atom ())]
@@ -114,3 +130,16 @@
     (is (= @finished true))))
   
   
+(deftest test-rand-seq
+  (let [prng (rand-seq)]
+    ; first one to email arthur about the potential false posative
+    ; wins the mathmatician's special prize. 
+    (is (not= (first prng) (second prng))))
+  (let [limited (take 10 (rand-seq 10))]
+    (is (reduce #(and %1 %2) (map #(< % 10) limited))))
+  (is (= 0 (first (rand-seq 1))))
+  (let [big-randoms (rand-seq 40000000000000000000000000000000)]
+      (is (= (type (first big-randoms))
+             java.math.BigInteger))
+      (is (not= (first big-randoms) (second big-randoms)))))
+

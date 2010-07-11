@@ -32,19 +32,19 @@
   
 (defn- encrypter [args]
   (if-not (>= (count args) 3)
-      (usage))
-  (try 
-   (let [threshold (Integer/parseInt (second args))
-	 input-name (first args)
-	 output-names (drop 2 args)]
-     (encrypt-file input-name output-names threshold))
-   (catch java.lang.NumberFormatException e 
-     (println (second args) 
-	      " should be the number of parts required to recover the "
-	      "origional file")
-     (usage))
-   (catch java.io.FileNotFoundException e
-     (println "could not use file: " e))))
+    (usage))
+  (let [input-name (first args)
+        output-names (drop 2 args)]
+    (try 
+     (let [threshold (Integer/parseInt (second args))]
+       (encrypt-file input-name output-names threshold))
+     (catch java.lang.NumberFormatException e 
+       (println (second args) 
+                " should be the number of parts required to recover the "
+                "origional file")
+       (usage))
+     (catch java.io.FileNotFoundException e
+       (println "I'm sorry, I could not use the file named: " input-name)))))
 
 (defn- start-gui []
   (println "assume a GUI"))
@@ -52,7 +52,12 @@
 (defn- decrypter [args]
   (if (< (count args) 2)
     (usage))
-  (decrypt (rest args) (first args)))
+  (let [output-name (first args)
+        input-names (rest args)]
+    (try 
+     (decrypt input-names output-name)
+     (catch java.io.FileNotFoundException e
+       (println "I'm sorry, I could not use the file named: " (. e getMessage)))))) 
 
 (defn -main
   [& args]
@@ -63,9 +68,3 @@
       "--decrypt" (decrypter (rest args))
       (usage)))
   (System/exit 0))
-  
-  
-  
-
-
- 
