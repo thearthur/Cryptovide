@@ -21,8 +21,9 @@
  com.cryptovide.combine
  (:gen-class)
  (:use
-   com.cryptovide.modmath
-   com.cryptovide.misc))
+  clojure.contrib.logging
+  com.cryptovide.modmath
+  com.cryptovide.misc))
 
 (defn row
   "produce a single row for a matrix"
@@ -73,7 +74,7 @@
     (conj (map (fn [bottom] (row-op top bottom)) (next matrix)) top)))
   
 (defn solve [matrix]
-  (if debug (println matrix))
+  (debug matrix)
   (if (next matrix)
     (recur (corner (do-row-ops matrix)))
     (mod* (second (first matrix)) (modinv (first (first matrix))))))

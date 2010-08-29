@@ -13,7 +13,7 @@
 ;;     You should have received a copy of the GNU General Public License
 ;;     along with Cryptovide.  If not, see <http://www.gnu.org/licenses/>.
 ;;
-;;     copyright Arthur Ulfeldt 2010
+;;     copyright Arthur Ulfeldt 2009, 2010
 
 (ns 
  #^{:author "Arthur Ulfeldt", 
@@ -23,9 +23,9 @@
  (:import java.security.SecureRandom)
  (:use clojure.contrib.math
        com.cryptovide.modmath
+       clojure.contrib.logging
        [clojure.contrib.duck-streams :only (reader writer)]))
 
-(def debug false)
 (def default-block-size 8) ;bits
 
 (defstruct secret  :index :block-size :data :padding)

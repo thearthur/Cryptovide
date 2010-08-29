@@ -15,14 +15,21 @@
 ;;
 ;;     copyright Arthur Ulfeldt 2010 
 
+
 (ns 
     #^{:author "Arthur Ulfeldt", 
        :doc "Polynomial threshold encryption"}
   com.cryptovide.main
   (:gen-class)
   (:use
+   com.cryptovide.gui
+   com.cryptovide.checksum
+   clojure.contrib.logging
    com.cryptovide.encrypt
-   com.cryptovide.decrypt))
+   com.cryptovide.decrypt
+   com.cryptovide.log))
+
+(start-logging)
 
 (declare main) ; this looks cool, wonder what it does?
 (defn usage []
@@ -31,10 +38,12 @@
   (System/exit 1))
   
 (defn- encrypter [args]
+  (fatal "hello logger")
   (if-not (>= (count args) 3)
     (usage))
   (let [input-name (first args)
         output-names (drop 2 args)]
+    (debug (str  "input-name: " input-name "output-names: " output-names))
     (try 
      (let [threshold (Integer/parseInt (second args))]
        (encrypt-file input-name output-names threshold))
@@ -44,12 +53,19 @@
                 "origional file")
        (usage))
      (catch java.io.FileNotFoundException e
-       (println "I'm sorry, I could not use the file named: " input-name)))))
+       (debug e)
+       (println "I'm sorry, I could not use the file named: " input-name))
+     (catch Exception badness
+       (debug badness)
+       (println "I'm sorry, something i hadent expected went wrong, bummer :("
+                badness)))))
 
 (defn- start-gui []
   (println "assume a GUI"))
 
+
 (defn- decrypter [args]
+  "combine a set of secrets"
   (if (< (count args) 2)
     (usage))
   (let [output-name (first args)
@@ -57,14 +73,40 @@
     (try 
      (decrypt input-names output-name)
      (catch java.io.FileNotFoundException e
-       (println "I'm sorry, I could not use the file named: " (. e getMessage)))))) 
+       (println "I'm sorry, I could not use the file named: " (. e getMessage))))))
 
-(defn -main
-  [& args]
+
+(defn parse-args [args]
+  "handles basic option parsing. no options with args"
+  (let [potential-options (take-while #(not= "--" %) args)
+        after-dashes (rest (drop-while #(not= "--" %) args))
+        short-options (filter #(and (= (first %) \-) (not= (second %) \-))
+                              potential-options)
+        long-options (filter #(and (= (first %) \-) (= (second %) \-))
+                              potential-options)
+        arguments (filter #(not= (first %) \-) potential-options)
+        verbose-level (min 4 (count (filter #(= "-v" %)
+                                            short-options)))]
+    (. logger setLevel (log-levels verbose-level))
+    {:verbose-level verbose-level
+     :short-options short-options
+     :long-options  long-options
+     :arguments     (concat arguments after-dashes)}))
+
+
+(defn -main [& args]    
+  "where it all begins :)"
   (if (empty? args)
     (start-gui)
-    (condp = (first args)
-      "--encrypt" (encrypter (rest args))
-      "--decrypt" (decrypter (rest args))
-      (usage)))
+    (let [argument-map (parse-args args)
+          decrypt? (some #(= "--decrypt" %) (:long-optioins argument-map))
+          encrypt? (some #(= "--encrypt" %) (:long-optioins argument-map))]
+      (println argument-map)
+      (cond
+        (and encrypt? decrypt?) (usage)
+        (encrypt? (encrypter (:arguments argument-map)))
+        (decrypt? (decrypter (:arguments argument-map)))
+        true (usage))))
   (System/exit 0))
+
+

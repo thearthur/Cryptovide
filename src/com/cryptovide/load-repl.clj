@@ -32,6 +32,7 @@
    'com.cryptovide.decryptTest
    'com.cryptovide.testlib
    'com.cryptovide.gui
-   'com.cryptovide.checksum))
+   'com.cryptovide.checksum
+   'com.cryptovide.log))
 
 (load-all)

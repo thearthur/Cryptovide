@@ -34,7 +34,7 @@
 		      
 (defn split-chunks [secrets threshold x coificients]
   (flatten
-   (map #(split-chunk %1 threshold x %2)
+   (pmap #(split-chunk %1 threshold x %2)
 	(partition chunk-size chunk-size () secrets)
 	(partition (* chunk-size 
 		      (max 1 (dec threshold))) 

@@ -1,4 +1,3 @@
-
 ;; This file is part of Cryptovide.
 ;;
 ;;     Cryptovide is free software: you can redistribute it and/or modify
@@ -142,4 +141,3 @@
       (is (= (type (first big-randoms))
              java.math.BigInteger))
       (is (not= (first big-randoms) (second big-randoms)))))
-
