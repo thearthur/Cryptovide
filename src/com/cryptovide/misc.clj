@@ -202,9 +202,3 @@ callback function on the last elements."
   ([sequence n callback finished-callback]
      (drop-last (lazy-cat (seq-counter sequence n callback) 
                           (lazy-seq (cons (finished-callback) ()))))))
-
-;co rich hicky from the clojure mailing list
-  
-(defn flatten [x] 
-  (let [s? #(instance? clojure.lang.Sequential %)]
-    (filter (complement s?) (tree-seq s? seq x))))
