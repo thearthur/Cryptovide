@@ -9,3 +9,6 @@ nbproject/private/*
 .*~
 .*#.*#
 lib/*
+.cake/*
+classes/*
+pom.xml
