@@ -85,13 +85,16 @@
  (number-to-bytes 256) [(byte 0) (byte 1)])
 
 (simple-test
- (number-to-bytes 255) [(byte 255)])
+ (number-to-bytes 255) [(int-to-byte 255)])
 
 (simple-test
- (number-to-bytes 254) [(byte 254)])
+ (number-to-bytes 254) [(int-to-byte 254)])
 
 (simple-test
  (number-to-bytes 0) [0])
+
+(deftest test-int-to-byte
+  (map #(byte-to-int (int-to-byte %)) (range 256)))
 
 (deftest number-to-bytes-to-number
   (let [lots-of-big-numbers (map #(if (neg? %) (* -1 %) %)

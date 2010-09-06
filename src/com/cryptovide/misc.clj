@@ -31,9 +31,16 @@
 (defstruct secret  :index :block-size :data :padding)
 
 (defn byte-to-int [byte]
+  "casts a java.lang.byte to a number [0-255]"
   (if (neg? byte)
     (+ byte 256)
     byte))
+
+(defn int-to-byte [inty]
+  "casts a number [0-255] to a java.lang.byte"
+  (if (> inty 127)
+    (byte (- inty 256))
+    (byte inty)))
 
 (defn bytes-to-number [bytes] 
   "Converts a LEAST SIGNIFICANT BYTE FIRST sequence of BYTES to a whole Number"
@@ -50,7 +57,7 @@
   ([inty bytes]
      (if (= 0 inty)
        bytes
-       (recur (quot inty 256) (conj bytes (byte (rem inty 256)))))))
+       (recur (quot inty 256) (conj bytes (int-to-byte (rem inty 256)))))))
 
 (defn intify [stringy]
   (map int (seq stringy)))
