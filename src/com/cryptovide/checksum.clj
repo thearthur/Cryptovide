@@ -21,6 +21,7 @@
   com.cryptovide.checksum
   (:gen-class)
   (:use com.cryptovide.misc)
+  (:require [clojure.contrib.base64 :as base64])
   (:import (java.io.UnsupportedEncodingException)
 	   (java.security MessageDigest NoSuchAlgorithmException)))
 
@@ -54,4 +55,24 @@
 (defn message-digest-seq [seq digest-type]
   (md-seq seq (MessageDigest/getInstance (md-types digest-type))))
 
- (defn checksum-seq [seq interval])      
+(defn multiplex [into insert every-nth]
+  "combine two sequences by inserting one into the other at regular intervals"
+  (flatten (interleave (partition every-nth every-nth '() into) insert)))
+
+(defn de-multiplex [m every-nth]
+  "splits a multiplexed sequence into two sequences"
+  (let [chunks (partition (inc every-nth))]
+    [(map last chunks) (flatten (map butlast chunks))]))
+
+(defn checksum-seq [data interval]
+  "inserts a cheksum of data every interval'th position in the sequence"
+  (let [all-checksums (message-digest-seq data :sha-1)
+        ith-checksums (partition 1 (inc interval) all-checksums)]
+    (multiplex data ith-checksums interval)))
+
+(defn print-checksum-seq [checksum-seq]
+  (map #(if (= (type %)
+               (type (byte-array 0)))
+          (map int %)
+          %)
+       checksum-seq))
