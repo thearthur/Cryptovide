@@ -39,25 +39,34 @@
 (defmethod update-hash java.math.BigInteger [md inty]
   (. md update (into-array Byte/TYPE (number-to-bytes inty))))
 
-(defn md-seq [seq md]
+(defn md-seq [seq step md i]
   (if (empty? seq)
-    nil
+    (cons (. md digest) nil)
     (do
-      (update-hash md (first seq))
-      (lazy-seq
-        (let [md-copy (. md clone)]
-          (cons (. md digest)
-                (md-seq (rest seq) md-copy)))))))
+      (update-hash md (first seq))  
+      (if (empty? (rest seq))
+        (cons (. md digest) nil)
+        (if (zero? i)
+          (lazy-seq
+           (let [md-copy (. md clone)]
+             (cons (. md digest)
+                   (md-seq (rest seq) step md-copy step))))
+          (md-seq (rest seq) step md (dec i)))))))
 
 (def md-types
      {:sha-1 "SHA-1"})
 
-(defn message-digest-seq [seq digest-type]
-  (md-seq seq (MessageDigest/getInstance (md-types digest-type))))
+(defn message-digest-seq
+  ([seq digest-type] (message-digest-seq seq 0 digest-type))
+  ([seq step digest-type]
+     (md-seq seq step
+             (MessageDigest/getInstance (md-types digest-type))
+             step)))
 
 (defn multiplex [into insert every-nth]
   "combine two sequences by inserting one into the other at regular intervals"
-  (flatten (interleave (partition every-nth every-nth '() into) insert)))
+  (flatten (interleave (partition-all every-nth into)
+                       insert)))
 
 (defn de-multiplex [m every-nth]
   "splits a multiplexed sequence into two sequences"
@@ -66,9 +75,8 @@
 
 (defn checksum-seq [data interval]
   "inserts a cheksum of data every interval'th position in the sequence"
-  (let [all-checksums (message-digest-seq data :sha-1)
-        ith-checksums (partition 1 (inc interval) all-checksums)]
-    (multiplex data ith-checksums interval)))
+  (let [checksums (message-digest-seq data interval :sha-1)]
+    (multiplex data checksums interval)))
 
 (defn print-checksum-seq [checksum-seq]
   (map #(if (= (type %)
