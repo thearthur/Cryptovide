@@ -57,11 +57,11 @@
      {:sha-1 "SHA-1"})
 
 (defn message-digest-seq
-  ([seq digest-type] (message-digest-seq seq 0 digest-type))
+  ([seq digest-type] (message-digest-seq seq 1 digest-type))
   ([seq step digest-type]
-     (md-seq seq step
+     (md-seq seq (dec step)
              (MessageDigest/getInstance (md-types digest-type))
-             step)))
+             (dec step))))
 
 (defn multiplex [into insert every-nth]
   "combine two sequences by inserting one into the other at regular intervals"
