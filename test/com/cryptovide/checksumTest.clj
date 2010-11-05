@@ -24,7 +24,7 @@
         com.cryptovide.testlib
         clojure.contrib.test-is)
   (:import (java.io.UnsupportedEncodingException)
-	   (java.security MessageDigest NoSuchAlgorithmException)))
+           (java.security MessageDigest NoSuchAlgorithmException)))
 
 (defn hash-and-stringify [stuff]
   (map str (first (message-digest-seq stuff :sha-1))))

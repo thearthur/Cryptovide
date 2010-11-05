@@ -95,11 +95,11 @@
                                         ;              (println "bits:"bits "length:"length)
                  (if (>= length out-block-size)
                    (lazy-seq
-                     (cons
-                      (extract-bits bits out-block-size 0)
-                      (make-seq in-block-size out-block-size bytes
-                                (bit-shift-right-without-java-bugs bits out-block-size)
-                                (- length out-block-size) padding-ref)))
+                    (cons
+                     (extract-bits bits out-block-size 0)
+                     (make-seq in-block-size out-block-size bytes
+                               (bit-shift-right-without-java-bugs bits out-block-size)
+                               (- length out-block-size) padding-ref)))
                    (dosync
                     (let [some-bits  (first bytes)
                           more-bytes (rest bytes)]

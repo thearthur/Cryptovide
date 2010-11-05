@@ -29,7 +29,7 @@
    com.cryptovide.decrypt
    com.cryptovide.log))
 
-(start-logging)
+;(start-logging)
 
 (declare main) ; this looks cool, wonder what it does?
 (defn usage []
