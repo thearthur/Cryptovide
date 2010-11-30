@@ -68,7 +68,8 @@
 
 (defn start-logging []
   (org.apache.log4j.BasicConfigurator/configure)
-  (dorun (map trace-ns all-namespaces)))
+  ;(dorun (map trace-ns all-namespaces))
+  )
 
 (defn stop-logging []
   (dorun (map untrace-ns all-namespaces)))

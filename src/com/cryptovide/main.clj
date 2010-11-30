@@ -29,7 +29,7 @@
    com.cryptovide.decrypt
    com.cryptovide.log))
 
-;(start-logging)
+(start-logging)
 
 (declare main) ; this looks cool, wonder what it does?
 (defn usage []
@@ -37,13 +37,12 @@
   (println "--decrypt output-file part1 part2 part3 ...")
   (System/exit 1))
   
-(defn- encrypter [args]
-  (fatal "hello logger")
+(defn encrypter [args]
   (if-not (>= (count args) 3)
     (usage))
   (let [input-name (first args)
         output-names (drop 2 args)]
-    (debug (str  "input-name: " input-name "output-names: " output-names))
+    (println (str  "input-name: " input-name "output-names: " output-names))
     (try 
      (let [threshold (Integer/parseInt (second args))]
        (encrypt-file input-name output-names threshold))
@@ -60,11 +59,11 @@
        (println "I'm sorry, something i hadent expected went wrong, bummer :("
                 badness)))))
 
-(defn- start-gui []
+(defn start-gui []
   (println "assume a GUI"))
 
 
-(defn- decrypter [args]
+(defn decrypter [args]
   "combine a set of secrets"
   (if (< (count args) 2)
     (usage))

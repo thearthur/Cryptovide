@@ -78,3 +78,17 @@
   (let [filename (create-test-filename "_decrypted")]
     (decrypt [out-file1 out-file2] filename)
     (assert-file-contains filename test-data)))
+
+(deftest test-decrypt-padding
+  (let [input (create-test-filename "input_needs_padding")
+        encrypted1 (create-test-filename "encrypted_with_padding1")
+        encrypted2 (create-test-filename "encrypted_with_padding2")
+        decrypted  (create-test-filename "decrypted_without_padding1")]
+    (spit input "a")
+    (encrypt-file input [encrypted1 encrypted2] 2)
+    (let [files (open-input-files [encrypted1 encrypted2])
+          [secret1 secret2] (map read-input-file files)]
+      (dorun (:data secret1))
+      (dorun (:data secret2))
+      (is (= @(:padding secret1) 42))
+      (is (= @(:padding secret2) 42)))))

@@ -39,3 +39,18 @@
        ["--one" "--two"] '("--one" "--two")
        ["--one" "--" "--not-an-arg"] '("--one"))
   (stop-logging))
+
+(deftest test-start-gui
+  (is (= (start-gui) 42)))
+
+(def input-name (create-test-file "plaintext"))
+(def output-names (map create-test-filename ["1" "2" "3"]))
+(def result-name (create-test-filename "result"))
+
+(deftest encrypt-decrypt
+  (encrypter (concat (list input-name "2") output-names))
+  (decrypter (concat (list result-name) output-names))
+  (println "result-name:" (slurp result-name) "input-name:" (slurp input-name))
+  (is (= (slurp result-name) (slurp input-name)))
+  (is (= (count (slurp result-name)) (count (slurp input-name)))))
+
