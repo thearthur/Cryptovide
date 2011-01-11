@@ -141,13 +141,14 @@ callback function on the last elements."
 (defn write-block-seq
   "writes a sequence of blocks to a file and appends the trailer"
   [file blocks block-size padding-ref]
-    (dorun
-     (lazy-cat
-      (map #(. file (write (int %)))
-	   (block-seq block-size 8 blocks padding-ref))
-      (map #(. file (write %))
-	   (block-seq 32 8 (list (int @padding-ref)) (ref 0))))))
+    (dorun 
+     (map #(do 
+             (dorun (map (fn [n] (.write file (format "%03d " n))) %)) 
+             (.write file "\n")) 
+          (partition-all 10 (block-seq block-size 8 blocks padding-ref)))))
 
+(map #(map (fn [x] (Integer/parseInt x))
+           (re-seq #"[0-9]+" %)) lines)
 (defn read-block-seq
   "reads a sequence of blocks from a file and adds padding"
   [rdr block-size padding-ref]
