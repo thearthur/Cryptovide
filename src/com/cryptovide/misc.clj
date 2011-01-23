@@ -144,20 +144,14 @@ callback function on the last elements."
     (dorun 
      (map #(do 
              (dorun (map (fn [n] (.write file (format "%03d " n))) %)) 
-             (.write file "\n")) 
+             (.write file "\n"))
           (partition-all 10 (block-seq block-size 8 blocks padding-ref)))))
 
-(map #(map (fn [x] (Integer/parseInt x))
-           (re-seq #"[0-9]+" %)) lines)
 (defn read-block-seq
   "reads a sequence of blocks from a file and adds padding"
-  [rdr block-size padding-ref]
-  (block-seq 8 block-size 
-	     (butlast-with-callback
-	      (byte-seq rdr) ; this will close rdr
-	      4
-	      #(dosync (commute padding-ref + (bytes-to-number %))))
-             padding-ref))
+  [rdr]
+  (flatten (map #(map (fn [x] (Integer/parseInt x))
+                   (re-seq #"[0-9]+" %)) (line-seq rdr))))
 
 (defn write-seq-to-file [file-name & data]
   "writes sequences of things that can be cast to ints, to the open file"
