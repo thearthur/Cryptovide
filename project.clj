@@ -6,5 +6,6 @@
                                                 javax.jms/jms
                                                 com.sun.jdmk/jmxtools
                                                 com.sun.jmx/jmxri]]]
-    :dev-dependencies [[swank-clojure "1.2.1"]]
+    :dev-dependencies [[swank-clojure "1.2.1"]
+                       [lein-eclipse "1.0.0"]]
     :main com.cryptovide.main)
