@@ -25,18 +25,8 @@
         [clojure.contrib.duck-streams :only (reader writer)]))
 
 (defn- write-header [file cyphertext]
-  (. file (write (int (:index cyphertext))))
-  (. file (write (int (:block-size cyphertext)))))
-
-(defn write-block-seq
-  "writes a sequence of blocks to a file and appends the trailer"
-  [file blocks block-size padding-ref]
-    (dorun
-     (lazy-cat
-      (map #(. file (write (int %)))
-	   (block-seq block-size 8 blocks padding-ref))
-      (map #(. file (write %))
-	   (block-seq 32 8 (list (int @padding-ref)) (ref 0))))))
+  (.write file (format "%03d " (:index cyphertext)))
+  (.write file (format "%03d " (:block-size cyphertext))))
 
 (defn- create-footer [cyphertext]
   (byte (:padding cyphertext)))

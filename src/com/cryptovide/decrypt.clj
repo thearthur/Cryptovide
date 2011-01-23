@@ -34,16 +34,11 @@
 (defn open-input-files [file-names]
   (map open-input-file file-names))
 
-(defn read-header [open-file]
-  {:index (. open-file read)
-   :block-size (. open-file read)})
-
 (defn read-input-file [open-file]
-  (let [header (read-header open-file)
-	index (:index header)
-        block-size (:block-size header)
-	padding (ref 0)
-        data (read-block-seq open-file block-size padding)]
+  (let [data (read-block-seq open-file)
+	index (first data)
+        block-size (second data)
+	padding (ref 0)]
     (struct secret index block-size data padding)))
 
 (defn decrypt-files [file-names]
