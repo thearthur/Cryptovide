@@ -36,9 +36,9 @@
 (defn read-input-file [open-file]
   (let [data-and-header (read-block-seq open-file)
 	index (first data-and-header)
-        block-size (second data-and-header)
+        block-size 16
 	padding (ref 0)
-        data (drop 2 data-and-header)]
+        data (drop 1 data-and-header)]
     (struct secret index block-size data padding)))
 
 (defn decrypt-files [file-names]
