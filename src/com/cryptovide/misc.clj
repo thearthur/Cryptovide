@@ -140,29 +140,23 @@ callback function on the last elements."
       
 (defn write-block-seq
   "writes a sequence of blocks to a file and appends the trailer"
-  [file blocks block-size padding-ref]
+  [file blocks]
     (dorun 
      (map #(do 
-             (dorun (map (fn [n] (.write file (format "%03d " n))) %)) 
+             (dorun (map (fn [n] (.write file (format "%06d " n))) %)) 
              (.write file "\n"))
-          (partition-all 10 (block-seq block-size 8 blocks padding-ref)))))
+          (partition-all 10 blocks))))
 
 (defn read-block-seq
-  "reads a sequence of blocks from a file and adds padding"
+  "reads a sequence of blocks from a file (open with duck-streamd.reader"
   [rdr]
   (flatten (map #(map (fn [x] (Integer/parseInt x))
                    (re-seq #"[0-9]+" %)) (line-seq rdr))))
 
-(defn write-seq-to-file [file-name & data]
-  "writes sequences of things that can be cast to ints, to the open file"
-  (with-open [file (writer file-name)]
-    (when-not (empty? data)
-      (doall (map #(. file (write %))
-		  (if (seq? (first data))
-		    (map int (first data))
-		    (list (int (first data))))))
-      (recur file (rest data)))))
-
+(defn write-seq-to-file [file-name data]
+  "writes sequences of things that can be cast to bytes, to the open file"
+  (with-open [file (java.io.FileWriter. file-name)]
+    (dorun (map #(. file write %) (map int data)))))
 
 (defn new-secure-random-generator []
   (SecureRandom/getInstance "SHA1PRNG"))

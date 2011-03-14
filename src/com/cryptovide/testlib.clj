@@ -56,13 +56,11 @@
 
 (defmacro with-fake-prng [ & exprs ]
   "replaces the prng with one that produces consisten results"
-  `(binding [com.cryptovide.split/get-prng (fn [] (cycle [1 2 3]))
-             com.cryptovide.modmath/mody 719
-	     com.cryptovide.modmath/field-size 10]
+  `(binding [com.cryptovide.split/get-prng (fn [] (cycle [1 2 3]))]
      ~@exprs))
 
 (use '[clojure.contrib.duck-streams :only (writer)])
-(def test-data (seq (map int "the quick brown fox jumped over the lazy dog")))
+(def test-data (seq (map #(-> % int byte) "the quick brown fox jumped over the lazy dog")))
 
 (defn create-test-filename [suffix]
   "generate a temporary filename"
@@ -73,8 +71,7 @@
   ([] (create-test-file ""))
   ([suffix]
     (let [name (create-test-filename suffix)]
-      (with-open [test-file (writer name)]
-        (write-seq-to-file test-file test-data))
+      (write-seq-to-file name test-data)
       name)))
 
 (defn assert-file-contains [file expected]

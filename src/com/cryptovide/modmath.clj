@@ -35,11 +35,11 @@
 ;(def mody 8388617)
 
 ;a 63 bit prime
-(def mody 5742664875401159929)
+;(def mody 5742664875401159929)
 
 ;(def mody 151157)
-;;(def mody 719)
-(def field-size (count-bits mody))
+(def mody 719)
+(def field-size 16)
 ;;(def mody 11)
 
 (defn sane? [x]

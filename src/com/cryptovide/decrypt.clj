@@ -25,7 +25,6 @@
    com.cryptovide.combine
    [clojure.contrib.duck-streams :only (reader writer)]))
 
-(def file-block-size 8)
 
 (defn open-input-file [file-name]
   (try (reader file-name)
@@ -35,10 +34,11 @@
   (map open-input-file file-names))
 
 (defn read-input-file [open-file]
-  (let [data (read-block-seq open-file)
-	index (first data)
-        block-size (second data)
-	padding (ref 0)]
+  (let [data-and-header (read-block-seq open-file)
+	index (first data-and-header)
+        block-size (second data-and-header)
+	padding (ref 0)
+        data (drop 2 data-and-header)]
     (struct secret index block-size data padding)))
 
 (defn decrypt-files [file-names]
@@ -46,11 +46,10 @@
     (combine (map read-input-file files))))
 
 (defn decrypt [input-names output-name]
-  (with-open [output-file (writer output-name)]
-    (dorun (seq-counter 
-	    (write-seq-to-file 
-	     output-file 
-	     (decrypt-files input-names))
-	    1
-	    #(println "progress") 
-	    #(println "done") ))))
+  (dorun (seq-counter 
+          (write-seq-to-file 
+           output-name 
+           (decrypt-files input-names))
+          1
+          #(println "progress") 
+          #(println "done") )))

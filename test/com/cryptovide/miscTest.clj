@@ -35,16 +35,30 @@
       "Clojure core function seque is still broken :(")))
 
 (deftest test-write-seq-to-file
-    (with-open [test-file (writer input-file-name)]
-      (write-seq-to-file test-file \a (seq "test")))
-    (assert-file-contains input-file-name (intify (str \a "test"))))
+  (let [name (create-test-file)]
+    (write-seq-to-file name (seq "test"))
+    (assert-file-contains name (map int "test"))))
 
 (deftest test-byte-seq
-  (create-test-file)
-  (with-open [test-file (reader input-file-name)]
-    (let [result (byte-seq test-file)]
-      (is (= test-data result)))
-    (is (thrown? Exception (. test-file read)))))
+  (let [name (create-test-file)]
+    (with-open [test-file (reader name)]
+      (let [result (byte-seq test-file)]
+        (is (= test-data result)))
+      (is (thrown? Exception (. test-file read))))))
+
+(deftest test-write-block-sec
+  (let [name (create-test-file)]
+    (with-open [file (writer name)]
+      (write-block-seq file (map int "aaaa")))
+    (is (= (slurp name) "000097 000097 000097 000097 \n"))))
+
+(deftest write-then-read-block-seq
+  (let [name (create-test-file)] 
+    (with-open [file (writer name)]
+      (write-block-seq file (range 255)))
+    (is (= (with-open [file (reader name)]
+             (doall (read-block-seq file)))
+           (range 255)))))
 
 (simple-test (block-seq 8 3 [1] (ref 0)) '(1 0 0))
 (simple-test (block-seq 8 8 [1 2 3 4] (ref 0)) '(1 2 3 4))
