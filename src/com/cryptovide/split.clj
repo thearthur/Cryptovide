@@ -46,5 +46,8 @@
      (let [spliter (fn [x coificients]
 		      (split-chunks secrets threshold x coificients))
 	   prng (get-prng)]
-       (map (fn [x] (struct secret x field-size (spliter x prng)))
+       (map (fn [x] {:index x
+                    :modulous mody
+                    :data (spliter x prng)
+                    :padding nil})
 	    (take parts (range 1 (inc parts)))))))

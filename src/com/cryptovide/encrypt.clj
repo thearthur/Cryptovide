@@ -25,7 +25,9 @@
         [clojure.contrib.duck-streams :only (reader writer)]))
 
 (defn- write-header [file cyphertext]
-  (.write file (format "%03d " (:index cyphertext))))
+  (.write file (format "%03d " (:index cyphertext)))
+  (.write file (format "%06d " (:modulous cyphertext)))
+  (.write file "\n"))
 
 (defn- split-file [filename parts threshold]
   (split (byte-seq (reader filename))
