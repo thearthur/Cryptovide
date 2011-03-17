@@ -39,7 +39,7 @@
 
 ;(def mody 151157)
 (def mody 719)
-(def field-size 16)
+(def field-size 9)
 ;;(def mody 11)
 
 (defn sane? [x]
