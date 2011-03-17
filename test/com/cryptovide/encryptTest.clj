@@ -27,6 +27,12 @@
    clojure.contrib.test-is
    [clojure.contrib.duck-streams :only (reader writer)]))
 
+(deftest test-write-block-sec
+  (let [name (create-test-file)]
+    (with-open [file (writer name)]
+      (write-block-seq file (map int "aaaa")))
+    (is (= (slurp name) "097 097 097 097 \n"))))
+
 (deftest test-encrypt-file
   (create-test-file)
   (let [file1 (str input-file-name "1")

@@ -29,6 +29,15 @@
   (.write file (format "%03d " (:modulous cyphertext)))
   (.write file "\n"))
 
+(defn write-block-seq
+  "writes a sequence of blocks to a file and appends the trailer"
+  [file blocks]
+    (dorun 
+     (map #(do 
+             (dorun (map (fn [n] (.write file (format "%03d " n))) %)) 
+             (.write file "\n"))
+          (partition-all 10 blocks))))
+
 (defn- split-file [filename parts threshold]
   (split (byte-seq (reader filename))
          threshold parts))

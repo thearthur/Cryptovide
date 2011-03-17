@@ -33,6 +33,12 @@
 (defn open-input-files [file-names]
   (map open-input-file file-names))
 
+(defn read-block-seq
+  "reads a sequence of blocks from a file (open with duck-streamd.reader"
+  [rdr]
+  (flatten (map #(map (fn [x] (Integer/parseInt x))
+                   (re-seq #"[0-9]+" %)) (line-seq rdr))))
+
 (defn read-input-file [file-name]
   (let [data-and-header (read-block-seq file-name)]
     {:index (first data-and-header)

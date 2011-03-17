@@ -27,7 +27,7 @@
    com.cryptovide.testlib
    clojure.contrib.test-is
    com.cryptovide.encrypt
-   [clojure.contrib.duck-streams :only (reader)]))
+   [clojure.contrib.duck-streams :only (reader writer)]))
 
 (deftest test-open-files
   (let [file1 (create-test-file "1")
@@ -36,6 +36,14 @@
         files (open-input-files [file1 file2 file3])]
     (is (= (byte-seq (first files)) test-data))
     (is (= (byte-seq (second files)) test-data))))
+
+(deftest write-then-read-block-seq
+  (let [name (create-test-file)] 
+    (with-open [file (writer name)]
+      (write-block-seq file (range 255)))
+    (is (= (with-open [file (reader name)]
+             (doall (read-block-seq file)))
+           (range 255)))))
 
 (def in-file (create-test-file "decrypt_test"))
 (def out-file1 (create-test-filename "_encrypted_1"))

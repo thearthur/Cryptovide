@@ -137,21 +137,6 @@ callback function on the last elements."
        (let [[tmp rest-of-col] (split-at n col)
 	     buffer (into  (queue) tmp)]
 	 (helper rest-of-col n callback buffer)))))
-      
-(defn write-block-seq
-  "writes a sequence of blocks to a file and appends the trailer"
-  [file blocks]
-    (dorun 
-     (map #(do 
-             (dorun (map (fn [n] (.write file (format "%03d " n))) %)) 
-             (.write file "\n"))
-          (partition-all 10 blocks))))
-
-(defn read-block-seq
-  "reads a sequence of blocks from a file (open with duck-streamd.reader"
-  [rdr]
-  (flatten (map #(map (fn [x] (Integer/parseInt x))
-                   (re-seq #"[0-9]+" %)) (line-seq rdr))))
 
 (defn write-seq-to-file [file-name data]
   "writes sequences of things that can be cast to bytes, to the open file"
