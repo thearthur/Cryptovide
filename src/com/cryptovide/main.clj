@@ -42,7 +42,6 @@
     (usage))
   (let [input-name (first args)
         output-names (drop 2 args)]
-    (println (str  "input-name: " input-name "output-names: " output-names))
     (try 
      (let [threshold (Integer/parseInt (second args))]
        (encrypt-file input-name output-names threshold))
@@ -100,7 +99,6 @@
     (let [argument-map (parse-args args)
           decrypt? (some #(= "--decrypt" %) (:long-optioins argument-map))
           encrypt? (some #(= "--encrypt" %) (:long-optioins argument-map))]
-      (println argument-map)
       (cond
         (and encrypt? decrypt?) (usage)
         (encrypt? (encrypter (:arguments argument-map)))

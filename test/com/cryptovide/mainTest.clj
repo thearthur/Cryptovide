@@ -50,7 +50,6 @@
 (deftest encrypt-decrypt
   (encrypter (concat (list input-name "2") output-names))
   (decrypter (concat (list result-name) output-names))
-  (println "result-name:" (slurp result-name) "input-name:" (slurp input-name))
   (is (= (slurp result-name) (slurp input-name)))
   (is (= (count (slurp result-name)) (count (slurp input-name)))))
 
