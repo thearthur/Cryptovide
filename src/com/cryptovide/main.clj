@@ -97,12 +97,12 @@
   (if (empty? args)
     (start-gui)
     (let [argument-map (parse-args args)
-          decrypt? (some #(= "--decrypt" %) (:long-optioins argument-map))
-          encrypt? (some #(= "--encrypt" %) (:long-optioins argument-map))]
+          decrypt? (contains? (set (:long-options argument-map)) "--decrypt")
+          encrypt? (contains? (set (:long-options argument-map)) "--encrypt")]
       (cond
         (and encrypt? decrypt?) (usage)
-        (encrypt? (encrypter (:arguments argument-map)))
-        (decrypt? (decrypter (:arguments argument-map)))
+        encrypt? (encrypter (:arguments argument-map))
+        decrypt? (decrypter (:arguments argument-map))
         true (usage))))
   (System/exit 0))
 
