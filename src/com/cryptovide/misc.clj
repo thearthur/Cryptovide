@@ -183,3 +183,10 @@ callback function on the last elements."
   ([sequence n callback finished-callback]
      (drop-last (lazy-cat (seq-counter sequence n callback) 
                           (lazy-seq (cons (finished-callback) ()))))))
+
+(defn root-cause [exception]
+  "extracts the error Message from the innermost exception"
+  (. (last
+      (take-while #(not (nil? %))
+                  (iterate #(when % (. % getCause)) exception)))
+     getMessage))

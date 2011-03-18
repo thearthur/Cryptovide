@@ -53,3 +53,6 @@
   (is (= (slurp result-name) (slurp input-name)))
   (is (= (count (slurp result-name)) (count (slurp input-name)))))
 
+(deftest file-not-found
+  (is (= (with-out-str (decrypter ["/tmp/should-not-be-written" "/does/not/exist"]))
+         "I'm sorry, I could not use the file named:  /does/not/exist (No such file or directory)\n")))

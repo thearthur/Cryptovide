@@ -26,12 +26,8 @@
    [clojure.contrib.duck-streams :only (reader writer)]))
 
 
-(defn open-input-file [file-name]
-  (try (reader file-name)
-    (catch Exception e (println e))))
-
 (defn open-input-files [file-names]
-  (map open-input-file file-names))
+  (map #(reader %) file-names))
 
 (defn read-block-seq
   "reads a sequence of blocks from a file (open with duck-streamd.reader"

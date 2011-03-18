@@ -27,7 +27,8 @@
    clojure.contrib.logging
    com.cryptovide.encrypt
    com.cryptovide.decrypt
-   com.cryptovide.log))
+   com.cryptovide.log
+   com.cryptovide.misc))
 
 ;(start-logging)
 
@@ -70,8 +71,8 @@
         input-names (rest args)]
     (try 
      (decrypt input-names output-name)
-     (catch java.io.FileNotFoundException e
-       (println "I'm sorry, I could not use the file named: " (. e getMessage))))))
+     (catch Exception e
+       (println "I'm sorry, I could not use the file named: " (root-cause e))))))
 
 
 (defn parse-args [args]
